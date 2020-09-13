@@ -6,7 +6,7 @@ import * as ejs from 'ejs';
 import { getTemplate, listTemplates } from '../domain/templates';
 import { TextDecoder } from 'util';
 
-export default async (uri: vscode.Uri) => {
+export default async (uri: vscode.Uri): Promise<void> => {
   const templateName = await vscode.window.showQuickPick(
     listTemplates(),
   );

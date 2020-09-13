@@ -62,9 +62,9 @@ class Template {
  *
  * @param extContext - The current extension context given by VSCode to the activate method.
  */
-export function setExtensionContext(extContext: ExtensionContext | null) {
+export function setExtensionContext(extContext: ExtensionContext | null): void {
   extensionContext = extContext;
-};
+}
 
 /**
  * Persist the template list.
@@ -145,7 +145,7 @@ export function listTemplates(): Array<string> {
  * @param name - Template name.
  * @param ext - Template file extension.
  */
-export async function createTemplate(name: string, ext: string) {
+export async function createTemplate(name: string, ext: string): Promise<Template> {
   const template = new Template({ name, ext });
 
   await Promise.all([
@@ -161,7 +161,7 @@ export async function createTemplate(name: string, ext: string) {
  * @param name - Template name.
  * @param content - Template content.
  */
-export function updateTemplate(name: string, content: Uint8Array) {
+export function updateTemplate(name: string, content: Uint8Array): Promise<void> {
   const template = getTemplate(name);
 
   if (!template) {
@@ -177,7 +177,7 @@ export function updateTemplate(name: string, content: Uint8Array) {
  * Remove a template.
  * @param name - Name of template to remove.
  */
-export async function removeTemplate(name: string) {
+export async function removeTemplate(name: string): Promise<[void, void]> {
   const templates = new Set(await listTemplates());
   templates.delete(name);
 

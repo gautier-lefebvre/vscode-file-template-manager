@@ -18,7 +18,7 @@ export function createTemplateEditorUri(name: string, ext: string | undefined): 
   return uri;
 }
 
-export async function openTemplateEditor(name: string, ext: string | undefined) {
+export async function openTemplateEditor(name: string, ext: string | undefined): Promise<void> {
   const uri = createTemplateEditorUri(name, ext);
   const templateDocument = await vscode.workspace.openTextDocument(uri);
   vscode.window.showTextDocument(templateDocument);

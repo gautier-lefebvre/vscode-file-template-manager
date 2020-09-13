@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 
 import { openTemplateEditor } from '../domain/editor';
 
-export default async () => {
+export default async (): Promise<void> => {
   const name = await vscode.window.showInputBox({
     prompt: 'Template name',
     placeHolder: 'React Component',

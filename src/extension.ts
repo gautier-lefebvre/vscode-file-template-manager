@@ -9,7 +9,7 @@ import editFileTemplate from './commands/editFileTemplate';
 import removeFileTemplate from './commands/removeFileTemplate';
 import createNewFileFromTemplate from './commands/createNewFileFromTemplate';
 
-export function activate(context: vscode.ExtensionContext) {
+export function activate(context: vscode.ExtensionContext): void {
   console.log('Active');
 
   setExtensionContext(context);
@@ -47,6 +47,6 @@ export function activate(context: vscode.ExtensionContext) {
 }
 
 // this method is called when your extension is deactivated
-export function deactivate() {
+export function deactivate(): void {
   setExtensionContext(null);
 }

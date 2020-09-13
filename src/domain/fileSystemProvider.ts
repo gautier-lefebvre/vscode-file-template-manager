@@ -2,7 +2,6 @@ import * as vscode from 'vscode';
 import { decode as qsDecode } from 'querystring';
 
 import { createTemplate, getTemplate, removeTemplate, updateTemplate } from './templates';
-import { TextEncoder } from 'util';
 
 export default class FileTemplateManagerFileSystemProvider implements vscode.FileSystemProvider {
   onDidChangeFileEmitter = new vscode.EventEmitter<vscode.FileChangeEvent[]>();
@@ -11,7 +10,7 @@ export default class FileTemplateManagerFileSystemProvider implements vscode.Fil
   _bufferedEvents: vscode.FileChangeEvent[] = [];
   _eventEmitTimeoutHandle: NodeJS.Timeout | null = null;
 
-  _emitEvent(event: vscode.FileChangeEvent) {
+  _emitEvent(event: vscode.FileChangeEvent): void {
     this._bufferedEvents.push(event);
 
     if (this._eventEmitTimeoutHandle) {
@@ -28,16 +27,15 @@ export default class FileTemplateManagerFileSystemProvider implements vscode.Fil
     );
   }
 
-  readFile(uri: vscode.Uri) {
-    const { name, ext } = qsDecode(uri.query) as { name: string, ext: string };
+  readFile(uri: vscode.Uri): Uint8Array {
+    const { name } = qsDecode(uri.query) as { name: string, ext: string };
     return getTemplate(name)?.content || new Uint8Array();
   }
 
   async writeFile(
     uri: vscode.Uri,
     content: Uint8Array,
-    options: { create: boolean, overwrite: boolean },
-  ) {
+  ): Thenable<void> {
     const { name, ext } = qsDecode(uri.query) as { name: string, ext: string };
 
     const template = getTemplate(name);
@@ -69,22 +67,31 @@ export default class FileTemplateManagerFileSystemProvider implements vscode.Fil
       };
   }
 
-  async delete(uri: vscode.Uri, options: { recursive: boolean }) {
+  async delete(uri: vscode.Uri): Thenable<void> {
     const { name } = qsDecode(uri.query) as { name: string };
     await removeTemplate(name);
     this._emitEvent({ type: vscode.FileChangeType.Deleted, uri: uri });
   }
 
-  watch(uri: vscode.Uri, options: { excludes: string[], recursive: boolean }) {
-    return new vscode.Disposable(() => { });
+  watch(): vscode.Disposable {
+    // Ignore. Events are fired.
+    return new vscode.Disposable(() => null);
   }
 
-  copy() {}
-  createDirectory(uri: vscode.Uri) {}
+  copy(): void {
+    // Ignore. Cannot copy templates.
+  }
 
-  readDirectory(uri: vscode.Uri) {
+  createDirectory(): void {
+    // Ignore. Cannot create template directories.
+  }
+
+  readDirectory(): [string, vscode.FileType][] {
+    // Ignore. Cannot create template directories.
     return [];
   }
 
-  rename(oldUri: vscode.Uri, newUri: vscode.Uri, options: { overwrite: boolean }) {}
+  rename(): void {
+    // Ignore. Cannot rename a template.
+  }
 }

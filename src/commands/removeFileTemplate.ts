@@ -3,7 +3,7 @@ import * as vscode from 'vscode';
 import { getTemplate, listTemplates } from '../domain/templates';
 import { createTemplateEditorUri } from '../domain/editor';
 
-export default async () => {
+export default async (): Promise<void> => {
   const name = await vscode.window.showQuickPick(
     listTemplates(),
   );
