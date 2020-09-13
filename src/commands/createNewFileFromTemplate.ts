@@ -19,6 +19,7 @@ export default async (uri: vscode.Uri) => {
     }
 
     const fileName = await vscode.window.showInputBox({
+      prompt: 'New file name',
       placeHolder: `MyComponent${template.ext}`,
       value: `MyComponent${template.ext}`,
       valueSelection: [0, 11],
