@@ -1,5 +1,6 @@
-import * as vscode from 'vscode';
 import { stringify } from 'querystring';
+
+import * as vscode from 'vscode';
 
 import { FTM_FS_SCHEME } from '../config/constants';
 
@@ -12,7 +13,7 @@ export function createTemplateEditorUri(name: string, ext: string | undefined): 
   });
 
   const uri = vscode.Uri.parse(
-    `${FTM_FS_SCHEME}:/${encodeURIComponent(templateEditorFileName)}?${queryString}`
+    `${FTM_FS_SCHEME}:/${encodeURIComponent(templateEditorFileName)}?${queryString}`,
   );
 
   return uri;

@@ -1,27 +1,34 @@
 import * as vscode from 'vscode';
 import { decode as qsDecode } from 'querystring';
 
-import { createTemplate, getTemplate, removeTemplate, updateTemplate } from './templates';
+import {
+  createTemplate,
+  getTemplate,
+  removeTemplate,
+  updateTemplate,
+} from './templates';
 
 export default class FileTemplateManagerFileSystemProvider implements vscode.FileSystemProvider {
   onDidChangeFileEmitter = new vscode.EventEmitter<vscode.FileChangeEvent[]>();
+
   onDidChangeFile = this.onDidChangeFileEmitter.event;
 
-  _bufferedEvents: vscode.FileChangeEvent[] = [];
-  _eventEmitTimeoutHandle: NodeJS.Timeout | null = null;
+  private bufferedEvents: vscode.FileChangeEvent[] = [];
 
-  _emitEvent(event: vscode.FileChangeEvent): void {
-    this._bufferedEvents.push(event);
+  private eventEmitTimeoutHandle: NodeJS.Timeout | null = null;
 
-    if (this._eventEmitTimeoutHandle) {
-      clearTimeout(this._eventEmitTimeoutHandle);
+  private emitEvent(event: vscode.FileChangeEvent): void {
+    this.bufferedEvents.push(event);
+
+    if (this.eventEmitTimeoutHandle) {
+      clearTimeout(this.eventEmitTimeoutHandle);
     }
 
-    this._eventEmitTimeoutHandle = setTimeout(
+    this.eventEmitTimeoutHandle = setTimeout(
       () => {
-        this.onDidChangeFileEmitter.fire(this._bufferedEvents);
-        this._bufferedEvents = [];
-        this._eventEmitTimeoutHandle = null;
+        this.onDidChangeFileEmitter.fire(this.bufferedEvents);
+        this.bufferedEvents = [];
+        this.eventEmitTimeoutHandle = null;
       },
       10,
     );
@@ -42,11 +49,11 @@ export default class FileTemplateManagerFileSystemProvider implements vscode.Fil
 
     if (!template) {
       await createTemplate(name, ext);
-      this._emitEvent({ type: vscode.FileChangeType.Created, uri: uri });
+      this.emitEvent({ type: vscode.FileChangeType.Created, uri });
     }
 
     await updateTemplate(name, content);
-    this._emitEvent({ type: vscode.FileChangeType.Changed, uri: uri });
+    this.emitEvent({ type: vscode.FileChangeType.Changed, uri });
   }
 
   stat(uri: vscode.Uri): vscode.FileStat {
@@ -70,7 +77,7 @@ export default class FileTemplateManagerFileSystemProvider implements vscode.Fil
   async delete(uri: vscode.Uri): Thenable<void> {
     const { name } = qsDecode(uri.query) as { name: string };
     await removeTemplate(name);
-    this._emitEvent({ type: vscode.FileChangeType.Deleted, uri: uri });
+    this.emitEvent({ type: vscode.FileChangeType.Deleted, uri });
   }
 
   watch(): vscode.Disposable {

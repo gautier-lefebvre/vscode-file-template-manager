@@ -16,13 +16,16 @@ type RawTemplate = {
 class Template {
   /** Name of the template. e.g. "React Component". */
   name: string;
+
   /** File extension of the template. e.g. ".jsx". */
   ext: string;
+
   /** Content of the template, to load when creating a file from a template. */
   content: Uint8Array;
 
   /** Creation timestamp. */
   ctime: number;
+
   /** Last modification timestamp. */
   mtime: number;
 

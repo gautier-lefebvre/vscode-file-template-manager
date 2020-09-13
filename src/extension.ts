@@ -10,8 +10,6 @@ import removeFileTemplate from './commands/removeFileTemplate';
 import createNewFileFromTemplate from './commands/createNewFileFromTemplate';
 
 export function activate(context: vscode.ExtensionContext): void {
-  console.log('Active');
-
   setExtensionContext(context);
 
   vscode.workspace.registerFileSystemProvider(
