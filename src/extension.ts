@@ -1,6 +1,12 @@
 import * as vscode from 'vscode';
 
-import { FTM_FS_SCHEME } from './config/constants';
+import {
+  CREATE_FILE_TEMPLATE_COMMAND_ID,
+  EDIT_FILE_TEMPLATE_COMMAND_ID,
+  REMOVE_FILE_TEMPLATE_COMMAND_ID,
+  CREATE_FILE_FROM_TEMPLATE_COMMAND_ID,
+  FTM_FS_SCHEME,
+} from './config/constants';
 import { setExtensionContext } from './domain/templates';
 import FileTemplateManagerFileSystemProvider from './domain/fileSystemProvider';
 
@@ -19,22 +25,22 @@ export function activate(context: vscode.ExtensionContext): void {
   );
 
   const createNewFileTemplateCmd = vscode.commands.registerCommand(
-    'file-template-manager.createNewFileTemplate',
+    CREATE_FILE_TEMPLATE_COMMAND_ID,
     createNewFileTemplate,
   );
 
   const editFileTemplateCmd = vscode.commands.registerCommand(
-    'file-template-manager.editFileTemplate',
+    EDIT_FILE_TEMPLATE_COMMAND_ID,
     editFileTemplate,
   );
 
   const removeFileTemplateCmd = vscode.commands.registerCommand(
-    'file-template-manager.removeFileTemplate',
+    REMOVE_FILE_TEMPLATE_COMMAND_ID,
     removeFileTemplate,
   );
 
   const createNewFileFromTemplateCmd = vscode.commands.registerCommand(
-    'file-template-manager.createNewFileFromTemplate',
+    CREATE_FILE_FROM_TEMPLATE_COMMAND_ID,
     createNewFileFromTemplate,
   );
 

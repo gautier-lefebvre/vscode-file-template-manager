@@ -42,7 +42,7 @@ export default class FileTemplateManagerFileSystemProvider implements vscode.Fil
   async writeFile(
     uri: vscode.Uri,
     content: Uint8Array,
-  ): Thenable<void> {
+  ): Promise<void> {
     const { name, ext } = qsDecode(uri.query) as { name: string, ext: string };
 
     const template = getTemplate(name);
@@ -60,21 +60,15 @@ export default class FileTemplateManagerFileSystemProvider implements vscode.Fil
     const { name } = qsDecode(uri.query) as { name: string };
     const template = getTemplate(name);
 
-    return template
-      ? {
-        ctime: template.ctime,
-        mtime: template.mtime,
-        size: template.content.byteLength,
-        type: vscode.FileType.File,
-      } : {
-        ctime: Date.now(),
-        mtime: Date.now(),
-        size: 0,
-        type: vscode.FileType.File,
-      };
+    return {
+      ctime: template?.ctime || Date.now(),
+      mtime: template?.mtime || Date.now(),
+      size: template?.content.byteLength || 0,
+      type: vscode.FileType.File,
+    };
   }
 
-  async delete(uri: vscode.Uri): Thenable<void> {
+  async delete(uri: vscode.Uri): Promise<void> {
     const { name } = qsDecode(uri.query) as { name: string };
     await removeTemplate(name);
     this.emitEvent({ type: vscode.FileChangeType.Deleted, uri });

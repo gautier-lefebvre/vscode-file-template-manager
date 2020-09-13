@@ -86,12 +86,12 @@ function setTemplateList(list: Array<string>) {
  * @param name - Template name.
  * @param value - New template value. Use undefined to unset.
  */
-function setTemplate(name: string, value: Template | undefined) {
+async function setTemplate(name: string, value: Template | undefined): Promise<void> {
   if (!extensionContext) {
     throw Error('Extension context is undefined');
   }
 
-  return extensionContext.globalState.update(`${MEMENTO_TEMPLATE_PREFIX}${name}`, value);
+  await extensionContext.globalState.update(`${MEMENTO_TEMPLATE_PREFIX}${name}`, value);
 }
 
 /**

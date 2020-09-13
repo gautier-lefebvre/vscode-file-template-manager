@@ -1,29 +1,39 @@
 {
   "root": true,
   "parser": "@typescript-eslint/parser",
+
   "env": {
     "node": true,
     "es6": true
   },
+
   "parserOptions": {
     "ecmaVersion": 6,
     "sourceType": "module",
     "project": "./tsconfig.json"
   },
+
   "plugins": [
     "@typescript-eslint"
   ],
+
   "extends": [
     "airbnb-typescript/base",
     "plugin:@typescript-eslint/eslint-recommended",
     "plugin:@typescript-eslint/recommended"
   ],
+
+  "globals": {
+    "NodeJS": "readonly"
+  },
+
   "rules": {
     "@typescript-eslint/naming-convention": "warn",
     "@typescript-eslint/semi": "warn",
 
     "import/prefer-default-export": "off",
-    "class-methods-use-this": "off"
+    "class-methods-use-this": "off",
+    "no-undef": "error"
   },
 
   "overrides": [
@@ -31,6 +41,9 @@
       "files": [
         "./src/test/**/*.ts"
       ],
+      "env": {
+        "mocha": true
+      },
       "rules": {
         "import/no-extraneous-dependencies": ["error", { "devDependencies": true }],
         "no-console": "off"

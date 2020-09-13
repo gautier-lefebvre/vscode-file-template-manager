@@ -26,15 +26,15 @@
       },
       {
         "command": "file-template-manager.createNewFileTemplate",
-        "title": "[Templates] Create a new file template"
+        "title": "[TEMPLATES] Create a new file template"
       },
       {
         "command": "file-template-manager.editFileTemplate",
-        "title": "[Templates] Edit a file template"
+        "title": "[TEMPLATES] Edit a file template"
       },
       {
         "command": "file-template-manager.removeFileTemplate",
-        "title": "[Templates] Remove a file template"
+        "title": "[TEMPLATES] Remove a file template"
       }
     ],
     "menus": {
