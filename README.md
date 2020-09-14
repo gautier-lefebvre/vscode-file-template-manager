@@ -2,6 +2,10 @@
 
 This is an extension for Visual Studio Code to manage file templates and create new files from said templates.
 
+## Disclaimer
+
+This is still in alpha so do not be surprised if you experience bugs.
+
 ## Features
 
 1. Create file templates.
