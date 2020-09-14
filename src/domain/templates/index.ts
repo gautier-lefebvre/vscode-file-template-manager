@@ -89,7 +89,7 @@ export function setExtensionContext(extContext: ExtensionContext | null): void {
  * Persist the template list.
  * @param list - List of persisted template names.
  */
-function setTemplateList(list: Array<string>): Promise<void> {
+async function setTemplateList(list: Array<string>): Promise<void> {
   if (!extensionContext) {
     // This should never happen.
     throw Error('Extension context is undefined');
