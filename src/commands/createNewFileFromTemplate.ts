@@ -33,9 +33,9 @@ export default async (uri: vscode.Uri): Promise<void> => {
   // Prompt user for the path of the file he wants to create.
   const fileName = await vscode.window.showInputBox({
     prompt: 'New file name',
-    placeHolder: `MyComponent${template.ext}`,
+    placeHolder: `MyComponent${template.ext || ''}`,
     // Pre-fill the value with the extension.
-    value: `MyComponent${template.ext}`,
+    value: `MyComponent${template.ext || ''}`,
     // Pre-select the name of the file without the extension.
     valueSelection: [0, 11],
   });

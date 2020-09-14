@@ -1,6 +1,6 @@
 import { TextDecoder, TextEncoder } from 'util';
 import { ExtensionContext } from 'vscode';
-import { MEMENTO_LIST_KEY, MEMENTO_TEMPLATE_PREFIX } from '../../config/constants';
+import { MEMENTO_GROUPS_KEY, MEMENTO_LIST_KEY, MEMENTO_TEMPLATE_PREFIX } from '../../config/constants';
 
 // Current extension context.
 let extensionContext: ExtensionContext | null = null;
@@ -143,6 +143,67 @@ export function listTemplates(): Array<string> {
 }
 
 /**
+ * Get the templates groups map.
+ */
+export function getTemplateGroups(): Record<string, string[]> {
+  if (!extensionContext) {
+    throw Error('Extension context is undefined');
+  }
+
+  return extensionContext.globalState.get(MEMENTO_GROUPS_KEY) || {};
+}
+
+/**
+ * Get the template groups names list.
+ */
+export function getTemplateGroupsNames(): string[] {
+  return Object.keys(getTemplateGroups());
+}
+
+/**
+ * Get the templates of a template group.
+ * @param name - Name of the template group.
+ * @returns The name of the templates of the template group.
+ */
+export function getTemplateGroupTemplates(name: string): string[] {
+  return getTemplateGroups()[name];
+}
+
+/**
+ * Persist updated template groups.
+ * @param groups - New template groups.
+ */
+export function setTemplateGroups(groups: Record<string, string[]>): Promise<void> {
+  return extensionContext.globalState.update(MEMENTO_GROUPS_KEY, groups);
+}
+
+/**
+ * Create a new template group. This does not check that the template group does not exist yet.
+ * @param groupName - Name of the group.
+ * @param templates - Name of the templates to add to the group.
+ */
+export function createTemplateGroup(groupName: string, templates: string[]): Promise<void> {
+  const groups = { ...getTemplateGroups() };
+  groups[groupName] = templates;
+  return setTemplateGroups(groups);
+}
+
+/**
+ * Edit a template group. This does the exact same thing as creating a template group.
+ */
+export const editTemplateGroup = createTemplateGroup;
+
+/**
+ * Remove a template group.
+ * @param groupName - Name of the template to remove.
+ */
+export function removeTemplateGroup(groupName: string): Promise<void> {
+  const groups = { ...getTemplateGroups() };
+  delete groups[groupName];
+  return setTemplateGroups(groups);
+}
+
+/**
  * Create a template. Will overwrite an existing template.
  *
  * @param name - Template name.
@@ -181,10 +242,20 @@ export function updateTemplate(name: string, content: Uint8Array): Promise<void>
  * @param name - Name of template to remove.
  */
 export async function removeTemplate(name: string): Promise<[void, void]> {
-  const templates = new Set(await listTemplates());
+  const templates = new Set(listTemplates());
   templates.delete(name);
 
+  const templateGroups = getTemplateGroups();
+  const newTemplateGroups = Object.keys(templateGroups).reduce(
+    (acc, groupName) => {
+      acc[groupName] = templateGroups[groupName].filter((templateName) => templateName !== name);
+      return acc;
+    },
+    {},
+  );
+
   return Promise.all([
+    setTemplateGroups(newTemplateGroups),
     setTemplateList([...templates]),
     unsetTemplate(name),
   ]);

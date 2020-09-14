@@ -29,7 +29,7 @@
 
   "rules": {
     "@typescript-eslint/naming-convention": "warn",
-    "@typescript-eslint/semi": "warn",
+    "@typescript-eslint/semi": "error",
 
     "import/prefer-default-export": "off",
     "class-methods-use-this": "off",

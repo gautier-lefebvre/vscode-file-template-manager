@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 
-import listTemplatesAndAskToCreateIfEmpty from './listTemplatesAndAskToCreateIfEmpty';
+import listTemplateGroupsAndAskToCreateIfEmpty from './listTemplateGroupsAndAskToCreateIfEmpty';
 
 /**
  * Prompt the user to select a template.
@@ -8,11 +8,11 @@ import listTemplatesAndAskToCreateIfEmpty from './listTemplatesAndAskToCreateIfE
  * Return the selected template name, or undefined if the command is aborted.
  */
 export default async (): Promise<string | undefined> => {
-  const userTemplates = await listTemplatesAndAskToCreateIfEmpty();
+  const userTemplateGroups = await listTemplateGroupsAndAskToCreateIfEmpty();
 
-  return userTemplates === undefined
+  return userTemplateGroups === undefined
     ? undefined
     : vscode.window.showQuickPick(
-      userTemplates,
+      userTemplateGroups,
     );
 };
