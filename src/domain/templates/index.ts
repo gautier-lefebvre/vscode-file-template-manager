@@ -95,7 +95,7 @@ function setTemplateList(list: Array<string>): Promise<void> {
     throw Error('Extension context is undefined');
   }
 
-  return extensionContext.globalState.update(MEMENTO_LIST_KEY, list);
+  await extensionContext.globalState.update(MEMENTO_LIST_KEY, list);
 }
 
 /**
@@ -198,8 +198,13 @@ export function getTemplateGroupTemplates(name: string): Array<string> | undefin
  * Persist updated template groups.
  * @param groups - New template groups.
  */
-export function setTemplateGroups(groups: Record<string, string[]>): Promise<void> {
-  return extensionContext.globalState.update(MEMENTO_GROUPS_KEY, groups);
+export async function setTemplateGroups(groups: Record<string, string[]>): Promise<void> {
+  if (!extensionContext) {
+  // This should never happen.
+    throw Error('Extension context is undefined');
+  }
+
+  await extensionContext.globalState.update(MEMENTO_GROUPS_KEY, groups);
 }
 
 /**
