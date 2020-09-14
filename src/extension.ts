@@ -26,11 +26,15 @@ import createNewFilesFromTemplateGroup from './commands/createNewFilesFromTempla
 export function activate(context: vscode.ExtensionContext): void {
   setExtensionContext(context);
 
+  // Register the template file system provider.
+  // Any Uri starting with our custom scheme will be redirected to our custom file system.
   vscode.workspace.registerFileSystemProvider(
     FTM_FS_SCHEME,
     new FileTemplateManagerFileSystemProvider(),
     { isCaseSensitive: true },
   );
+
+  // Register all command handlers.
 
   const createNewFileTemplateCmd = vscode.commands.registerCommand(
     CREATE_FILE_TEMPLATE_COMMAND_ID,
