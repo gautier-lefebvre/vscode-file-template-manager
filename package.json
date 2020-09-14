@@ -3,6 +3,7 @@
   "displayName": "file-template-manager",
   "description": "File template management",
   "version": "1.0.0-alpha.0",
+  "publisher": "gautier-lfbvr",
   "homepage": "https://github.com/gautier-lefebvre/vscode-file-template-manager#readme",
   "repository": {
     "type": "git",
