@@ -165,7 +165,7 @@ export function getTemplateGroupsNames(): string[] {
  * @param name - Name of the template group.
  * @returns The name of the templates of the template group.
  */
-export function getTemplateGroupTemplates(name: string): string[] {
+export function getTemplateGroupTemplates(name: string): string[] | undefined {
   return getTemplateGroups()[name];
 }
 
@@ -241,13 +241,13 @@ export function updateTemplate(name: string, content: Uint8Array): Promise<void>
  * Remove a template.
  * @param name - Name of template to remove.
  */
-export async function removeTemplate(name: string): Promise<[void, void]> {
+export async function removeTemplate(name: string): Promise<[void, void, void]> {
   const templates = new Set(listTemplates());
   templates.delete(name);
 
   const templateGroups = getTemplateGroups();
   const newTemplateGroups = Object.keys(templateGroups).reduce(
-    (acc, groupName) => {
+    (acc: Record<string, string[]>, groupName: string) => {
       acc[groupName] = templateGroups[groupName].filter((templateName) => templateName !== name);
       return acc;
     },

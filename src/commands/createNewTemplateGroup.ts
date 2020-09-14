@@ -1,7 +1,9 @@
 import * as vscode from 'vscode';
-import { createTemplateGroup } from '../domain/templates';
+import { createTemplateGroup, getTemplateGroupTemplates } from '../domain/templates';
 
 import listTemplatesAndAskToCreateIfEmpty from './common/listTemplatesAndAskToCreateIfEmpty';
+
+const OVERWRITE_GROUP_ACTION = 'Overwrite the template group';
 
 export default async (): Promise<void> => {
   const userTemplates = await listTemplatesAndAskToCreateIfEmpty();
@@ -25,6 +27,24 @@ export default async (): Promise<void> => {
 
   // If no template group name given, return;
   if (!templateGroupName) { return; }
+
+  const templateGroup = getTemplateGroupTemplates(templateGroupName);
+
+  if (templateGroup !== undefined) {
+    const actionSelected = await vscode.window.showInformationMessage(
+      'There is already a template group with this name. Do you want to overwrite it?',
+      OVERWRITE_GROUP_ACTION,
+    );
+
+    switch (actionSelected) {
+      // If the user clicks the overwrite action, proceed.
+      case OVERWRITE_GROUP_ACTION:
+        break;
+      // If the user dismisses the message, abort.
+      default:
+        return;
+    }
+  }
 
   await createTemplateGroup(templateGroupName, selectedTemplates);
 };

@@ -1,4 +1,5 @@
 import { basename } from 'path';
+import { TextDecoder } from 'util';
 
 import * as vscode from 'vscode';
 import * as ejs from 'ejs';
@@ -14,6 +15,7 @@ const OVERWRITE_MULTIPLE_FILES_ACTION = 'Overwrite them all';
 export default async (uri: vscode.Uri): Promise<void> => {
   const groupName = await selectSingleTemplateGroup();
 
+  // User dismissed the select or had no template groups, abort.
   if (!groupName) { return; }
 
   const templateGroupTemplatesNames = getTemplateGroupTemplates(groupName);
@@ -41,16 +43,6 @@ export default async (uri: vscode.Uri): Promise<void> => {
     }
   }
 
-  const templateGroupTemplates = templateGroupTemplatesNames.map((name) => {
-    const template = getTemplate(name);
-
-    if (!template) {
-      throw Error(`The template '${name}' could not be found.`);
-    }
-
-    return template;
-  });
-
   // This is the path without the extension added by each template.
   // E.g for templates with .jsx and .stories.mdx extensions,
   // to create my-component/MyComponent.jsx and my-component/MyComponent.stories.mdx,
@@ -64,8 +56,24 @@ export default async (uri: vscode.Uri): Promise<void> => {
     valueSelection: [0, 11],
   });
 
+  // User dismissed the input, abort.
+  if (!baseFilePath) { return; }
+
+  // my-component/MyComponent -> MyComponent.
   const baseFileName = basename(baseFilePath);
 
+  // Load the templates of the template group.
+  const templateGroupTemplates = templateGroupTemplatesNames.map((name) => {
+    const template = getTemplate(name);
+
+    if (!template) {
+      throw Error(`The template '${name}' could not be found.`);
+    }
+
+    return template;
+  });
+
+  // Compute the URI of all files that will be generated.
   const filesToRender = templateGroupTemplates.map((template) => ({
     template,
     fileUri: vscode.Uri.joinPath(
@@ -74,6 +82,7 @@ export default async (uri: vscode.Uri): Promise<void> => {
     ),
   }));
 
+  // Check which file already exist, to ask the user if he wants to overwrite them.
   const filesExist = await Promise.all(
     filesToRender.map(async ({ fileUri }) => {
       try {
@@ -91,6 +100,12 @@ export default async (uri: vscode.Uri): Promise<void> => {
   const filesThatDontExist = filesExist.filter((file) => !file.exists);
 
   const workspaceEdit = new vscode.WorkspaceEdit();
+
+  // Create the files that don't exist yet.
+  // For some reason this needs to be done before truncating existing files.
+  filesThatDontExist.forEach(({ fileUri }) => {
+    workspaceEdit.createFile(fileUri);
+  });
 
   // If any of the files to create exists, ask user if he wants to overwrite them.
   if (filesThatExist.length) {
@@ -127,11 +142,7 @@ export default async (uri: vscode.Uri): Promise<void> => {
     }
   }
 
-  // Create the files that don't exist yet.
-  filesThatDontExist.forEach(({ fileUri }) => {
-    workspaceEdit.createFile(fileUri);
-  });
-
+  // Generate and write the file contents.
   await Promise.all(filesToRender.map(async ({ template, fileUri }) => {
     // Use the template to generate the file content using ejs.
     const fileContent = await ejs.render(
@@ -146,10 +157,9 @@ export default async (uri: vscode.Uri): Promise<void> => {
     workspaceEdit.insert(fileUri, new vscode.Position(0, 0), fileContent);
   }));
 
+  // Apply all creations / edits.
   await vscode.workspace.applyEdit(workspaceEdit);
 
-  await Promise.all(filesToRender.map(async ({ fileUri }) => {
-    const fileDocument = await vscode.workspace.openTextDocument(fileUri);
-    vscode.window.showTextDocument(fileDocument);
-  }));
+  // Show the last created file.
+  await vscode.window.showTextDocument(filesToRender[filesToRender.length - 1].fileUri);
 };

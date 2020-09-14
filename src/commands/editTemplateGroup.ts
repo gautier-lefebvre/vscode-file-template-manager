@@ -15,6 +15,11 @@ export default async (groupName?: string): Promise<void> => {
   // Get the list of templates of the selected template group.
   const templateGroupTemplates = getTemplateGroupTemplates(selectedGroupName);
 
+  if (templateGroupTemplates === undefined) {
+    // This should never happen.
+    throw Error(`The template group '${selectedGroupName}' could not be found`);
+  }
+
   // Show the list of templates, and pre-select templates that are already in the group.
   const selectedTemplates = await vscode.window.showQuickPick(
     userTemplates.map((userTemplate) => ({

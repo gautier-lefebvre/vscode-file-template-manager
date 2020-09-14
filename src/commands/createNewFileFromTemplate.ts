@@ -100,7 +100,5 @@ export default async (uri: vscode.Uri): Promise<void> => {
   workspaceEdit.insert(fileUri, new vscode.Position(0, 0), fileContent);
   await vscode.workspace.applyEdit(workspaceEdit);
 
-  // Display the generated file in the editor.
-  const fileDocument = await vscode.workspace.openTextDocument(fileUri);
-  vscode.window.showTextDocument(fileDocument);
+  await vscode.window.showTextDocument(fileUri);
 };
