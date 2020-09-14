@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.0]
+### Added
+- When the extension prompts to select a template, the extension is displayed next to the name.
+
 ## [0.1.0]
 ### Added
 - Manage templates.
