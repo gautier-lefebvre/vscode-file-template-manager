@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 
 import listTemplatesAndAskToCreateIfEmpty from './listTemplatesAndAskToCreateIfEmpty';
+import mapTemplateNameToQuickPickItem from './mapTemplateNameToQuickPickItem';
 
 /**
  * Prompt the user to select a template.
@@ -10,9 +11,11 @@ import listTemplatesAndAskToCreateIfEmpty from './listTemplatesAndAskToCreateIfE
 export default async (): Promise<string | undefined> => {
   const userTemplates = await listTemplatesAndAskToCreateIfEmpty();
 
-  return userTemplates === undefined
-    ? undefined
-    : vscode.window.showQuickPick(
-      userTemplates,
-    );
+  if (!userTemplates) { return undefined; }
+
+  const selectedTemplate = await vscode.window.showQuickPick(
+    userTemplates.map((name) => mapTemplateNameToQuickPickItem(name)),
+  );
+
+  return selectedTemplate?.label;
 };

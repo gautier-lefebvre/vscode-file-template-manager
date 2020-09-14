@@ -2,6 +2,7 @@ import * as vscode from 'vscode';
 import { createTemplateGroup, getTemplateGroupTemplates } from '../domain/templates';
 
 import listTemplatesAndAskToCreateIfEmpty from './common/listTemplatesAndAskToCreateIfEmpty';
+import mapTemplateNameToQuickPickItem from './common/mapTemplateNameToQuickPickItem';
 
 const OVERWRITE_GROUP_ACTION = 'Overwrite the template group';
 
@@ -13,7 +14,7 @@ export default async (): Promise<void> => {
   }
 
   const selectedTemplates = await vscode.window.showQuickPick(
-    userTemplates,
+    userTemplates.map((name) => mapTemplateNameToQuickPickItem(name)),
     { canPickMany: true },
   );
 
@@ -46,5 +47,5 @@ export default async (): Promise<void> => {
     }
   }
 
-  await createTemplateGroup(templateGroupName, selectedTemplates);
+  await createTemplateGroup(templateGroupName, selectedTemplates.map((item) => item.label));
 };

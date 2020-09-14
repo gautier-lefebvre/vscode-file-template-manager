@@ -2,6 +2,7 @@ import * as vscode from 'vscode';
 
 import { editTemplateGroup, getTemplateGroupTemplates } from '../domain/templates';
 import listTemplatesAndAskToCreateIfEmpty from './common/listTemplatesAndAskToCreateIfEmpty';
+import mapTemplateNameToQuickPickItem from './common/mapTemplateNameToQuickPickItem';
 import selectSingleTemplateGroup from './common/selectSingleTemplateGroup';
 
 export default async (groupName?: string): Promise<void> => {
@@ -22,10 +23,10 @@ export default async (groupName?: string): Promise<void> => {
 
   // Show the list of templates, and pre-select templates that are already in the group.
   const selectedTemplates = await vscode.window.showQuickPick(
-    userTemplates.map((userTemplate) => ({
-      label: userTemplate,
-      picked: templateGroupTemplates.includes(userTemplate),
-    })),
+    userTemplates.map((name) => mapTemplateNameToQuickPickItem(
+      name,
+      templateGroupTemplates.includes(name),
+    )),
     { canPickMany: true },
   );
 
