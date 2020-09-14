@@ -10,7 +10,8 @@ This is an extension for Visual Studio Code to manage file templates and create 
 1. Create new files from templates.
     ![Create new files from templates](assets/createNewFileFromTemplate.gif)
 
-3. In the future, create template groups and generate multiple files with a single command.
+3. Create template groups from your file templates to generate multiple files from a single command.
+
 4. Also in the future, directly select the template in the explorer context menu. I'm waiting for
 Visual Studio Code to support dynamic contribution to the context menu for that one.
 
@@ -46,23 +47,59 @@ Calling out known issues can help limit users opening duplicate issues against y
 
 1. Open the command palette (`ctrl+shift+p` on Windows).
 2. Select `[TEMPLATES] Edit a file template`.
-3. Select the template to edit. If nothing is offered it's probably because you haven't created a template yet.
+3. Select the template to edit.
 4. Edit your template and save (`ctrl+s` like a regular file).
 
 #### Delete an existing template
 
 1. Open the command palette (`ctrl+shift+p` on Windows).
 2. Select `[TEMPLATES] Remove a file template`.
-3. Select the template to remove. If nothing is offered it's probably because you haven't created a template yet.
+3. Select the template to remove.
+4. Press `F` to pay respect.
+
+### Template groups
+
+Template groups are a way to group your templates (surprisedpikachu.jpg) to generate multiple files from a single command. For example, you may have a `React component` template and a `React component stories` template, that you need to generate everytime you create a new React component. Instead of doing the [Create a new file from a template](#create-a-new-file-from-a-template) process twice every time, you can define a template group with both templates, and generate both files with [Create new files from a template group](#create-new-files-from-a-template-group).
+
+#### Create a template group
+
+1. Open the command palette (`ctrl+shift+p` on Windows).
+2. Select `[TEMPLATES] Create a new template group`.
+3. Select the templates to add in the group.
+4. Give a name to your template group. If that group already exists you will be prompted to overwrite it.
+
+#### Edit an existing template group
+
+1. Open the command palette (`ctrl+shift+p` on Windows).
+2. Select `[TEMPLATES] Edit a template group`.
+3. Select the template group to edit.
+4. Select the templates to put in the group.
+
+#### Delete an existing template group
+
+1. Open the command palette (`ctrl+shift+p` on Windows).
+2. Select `[TEMPLATES] Remove a template group`.
+3. Select the template group to remove.
 4. Press `F` to pay respect.
 
 ### Use your templates
 
 #### Create a new file from a template
-1. Right click in the explorer menu.
+
+1. Right click on a folder in the explorer menu.
 2. Select `New file from template`.
-3. Select the template to use. If nothing is offered it's probably because you haven't created a template yet.
+3. Select the template to use.
 4. Give a name to your file. It should work like the regular file creation (you can provide a complete path and Visual Studio Code will create the missing folders).
+5. Hack.
+6. ???
+7. Profit.
+
+#### Create new files from a template group
+
+1. Right click on a folder in the explorer menu.
+2. Select `New files from template group`.
+3. Select the template group to use.
+4. Give a base name for your files. For example, if you want to create `my-component/MyComponent.jsx` and `my-component/MyComponent.stories.mdx` from templates with extensions `.jsx` and `.stories.mdx`, the base name will be `my-component/MyComponent`.
 5. Hack.
 6. ???
 7. Profit.
