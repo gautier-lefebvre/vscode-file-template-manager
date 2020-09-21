@@ -30,10 +30,13 @@
   "rules": {
     "@typescript-eslint/naming-convention": "warn",
     "@typescript-eslint/semi": "error",
+    "no-undef": "error",
 
     "import/prefer-default-export": "off",
     "class-methods-use-this": "off",
-    "no-undef": "error"
+    "no-await-in-loop": "off",
+    "no-continue": "off",
+    "no-plusplus": "off"
   },
 
   "overrides": [

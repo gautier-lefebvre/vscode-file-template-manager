@@ -1,6 +1,6 @@
 {
   "name": "file-template-manager",
-  "displayName": "file-template-manager",
+  "displayName": "File template manager",
   "description": "File template management",
   "version": "0.2.0",
   "publisher": "gautier-lfbvr",
@@ -22,58 +22,62 @@
   "contributes": {
     "commands": [
       {
-        "command": "file-template-manager.createNewFileFromTemplate",
+        "command": "file-template-manager.createFileFromTemplate",
         "title": "New file from template"
       },
       {
-        "command": "file-template-manager.createNewFilesFromTemplateGroup",
+        "command": "file-template-manager.createFilesFromTemplateGroup",
         "title": "New files from template group"
       },
       {
-        "command": "file-template-manager.createNewFileTemplate",
-        "title": "[TEMPLATES] Create a new file template"
+        "command": "file-template-manager.createTemplate",
+        "title": "[File template manager] Create a new file template"
       },
       {
-        "command": "file-template-manager.editFileTemplate",
-        "title": "[TEMPLATES] Edit a file template"
+        "command": "file-template-manager.editTemplate",
+        "title": "[File template manager] Edit a file template"
       },
       {
-        "command": "file-template-manager.removeFileTemplate",
-        "title": "[TEMPLATES] Remove a file template"
+        "command": "file-template-manager.editTemplateMetadata",
+        "title": "[File template manager] Edit a file template metadata"
       },
       {
-        "command": "file-template-manager.createNewTemplateGroup",
-        "title": "[TEMPLATES] Create a new template group"
+        "command": "file-template-manager.removeTemplate",
+        "title": "[File template manager] Remove a file template"
       },
       {
-        "command": "file-template-manager.editTemplateGroup",
-        "title": "[TEMPLATES] Edit a template group"
+        "command": "file-template-manager.createTemplateGroup",
+        "title": "[File template manager] Create a new file template group"
+      },
+      {
+        "command": "file-template-manager.editTemplateGroupMetadata",
+        "title": "[File template manager] Edit a file template group"
       },
       {
         "command": "file-template-manager.removeTemplateGroup",
-        "title": "[TEMPLATES] Remove a template group"
+        "title": "[File template manager] Remove a file template group"
       }
     ],
     "menus": {
       "explorer/context": [
         {
           "when": "explorerResourceIsFolder",
-          "command": "file-template-manager.createNewFileFromTemplate",
+          "command": "file-template-manager.createFileFromTemplate",
           "group": "navigation@4"
         },
         {
           "when": "explorerResourceIsFolder",
-          "command": "file-template-manager.createNewFilesFromTemplateGroup",
+          "command": "file-template-manager.createFilesFromTemplateGroup",
           "group": "navigation@5"
         }
       ],
       "commandPalette": [
         {
-          "command": "file-template-manager.createNewFileFromTemplate",
+          "command": "file-template-manager.createFileFromTemplate",
           "when": "never"
         },
         {
-          "command": "file-template-manager.createNewFilesFromTemplateGroup",
+          "command": "file-template-manager.createFilesFromTemplateGroup",
           "when": "never"
         }
       ]
@@ -104,6 +108,10 @@
     "vscode-test": "^1.4.0"
   },
   "dependencies": {
-    "ejs": "^3.1.5"
+    "ajv": "^6.12.5",
+    "cosmiconfig": "^7.0.0",
+    "ejs": "^3.1.5",
+    "escape-string-regexp": "^4.0.0",
+    "slugify": "^1.4.5"
   }
 }

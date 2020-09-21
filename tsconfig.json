@@ -7,6 +7,8 @@
     "lib": [
       "es6"
     ],
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
     "sourceMap": true,
     "rootDir": "src",
     "strict": true /* enable all strict type-checking options */
@@ -17,6 +19,8 @@
   },
   "exclude": [
     "node_modules",
+    "src/old",
+    "src/old2",
     ".vscode-test"
   ]
 }

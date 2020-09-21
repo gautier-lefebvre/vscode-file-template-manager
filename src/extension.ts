@@ -1,92 +1,70 @@
-import * as vscode from 'vscode';
+import { commands, ExtensionContext } from 'vscode';
 
-import {
-  CREATE_FILE_TEMPLATE_COMMAND_ID,
-  EDIT_FILE_TEMPLATE_COMMAND_ID,
-  REMOVE_FILE_TEMPLATE_COMMAND_ID,
-  CREATE_TEMPLATE_GROUP_COMMAND_ID,
-  EDIT_TEMPLATE_GROUP_COMMAND_ID,
-  REMOVE_TEMPLATE_GROUP_COMMAND_ID,
-  CREATE_FILE_FROM_TEMPLATE_COMMAND_ID,
-  CREATE_FILES_FROM_TEMPLATE_GROUP_COMMAND_ID,
-  FTM_FS_SCHEME,
-} from './config/constants';
-import { setExtensionContext } from './domain/templates';
-import FileTemplateManagerFileSystemProvider from './domain/fileSystemProvider';
+import { setExtensionContext } from './services/extensionContext';
 
-import createNewFileTemplate from './commands/createNewFileTemplate';
-import editFileTemplate from './commands/editFileTemplate';
-import removeFileTemplate from './commands/removeFileTemplate';
-import createNewTemplateGroup from './commands/createNewTemplateGroup';
-import editTemplateGroup from './commands/editTemplateGroup';
-import removeTemplateGroup from './commands/removeTemplateGroup';
-import createNewFileFromTemplate from './commands/createNewFileFromTemplate';
-import createNewFilesFromTemplateGroup from './commands/createNewFilesFromTemplateGroup';
+import { COMMANDS } from './constants';
+import { createTemplate } from './commands/createTemplate';
+import { editTemplate } from './commands/editTemplate';
+import { editTemplateMetadata } from './commands/editTemplateMetadata';
+import { removeTemplate } from './commands/removeTemplate';
+import { createTemplateGroup } from './commands/createTemplateGroup';
+import { editTemplateGroupMetadata } from './commands/editTemplateGroupMetadata';
+import { removeTemplateGroup } from './commands/removeTemplateGroup';
+import { createFileFromTemplate } from './commands/createFileFromTemplate';
+import { createFilesFromTemplateGroup } from './commands/createFilesFromTemplateGroup';
 
-export function activate(context: vscode.ExtensionContext): void {
+export async function activate(context: ExtensionContext): Promise<void> {
   setExtensionContext(context);
-
-  // Register the template file system provider.
-  // Any Uri starting with our custom scheme will be redirected to our custom file system.
-  vscode.workspace.registerFileSystemProvider(
-    FTM_FS_SCHEME,
-    new FileTemplateManagerFileSystemProvider(),
-    { isCaseSensitive: true },
-  );
 
   // Register all command handlers.
 
-  const createNewFileTemplateCmd = vscode.commands.registerCommand(
-    CREATE_FILE_TEMPLATE_COMMAND_ID,
-    createNewFileTemplate,
-  );
+  context.subscriptions.push(commands.registerCommand(
+    COMMANDS.CREATE_TEMPLATE,
+    createTemplate,
+  ));
 
-  const editFileTemplateCmd = vscode.commands.registerCommand(
-    EDIT_FILE_TEMPLATE_COMMAND_ID,
-    editFileTemplate,
-  );
+  context.subscriptions.push(commands.registerCommand(
+    COMMANDS.EDIT_TEMPLATE,
+    editTemplate,
+  ));
 
-  const removeFileTemplateCmd = vscode.commands.registerCommand(
-    REMOVE_FILE_TEMPLATE_COMMAND_ID,
-    removeFileTemplate,
-  );
+  context.subscriptions.push(commands.registerCommand(
+    COMMANDS.EDIT_TEMPLATE_METADATA,
+    editTemplateMetadata,
+  ));
 
-  const createNewTemplateGroupCmd = vscode.commands.registerCommand(
-    CREATE_TEMPLATE_GROUP_COMMAND_ID,
-    createNewTemplateGroup,
-  );
+  context.subscriptions.push(commands.registerCommand(
+    COMMANDS.REMOVE_TEMPLATE,
+    removeTemplate,
+  ));
 
-  const editTemplateGroupCmd = vscode.commands.registerCommand(
-    EDIT_TEMPLATE_GROUP_COMMAND_ID,
-    editTemplateGroup,
-  );
+  context.subscriptions.push(commands.registerCommand(
+    COMMANDS.CREATE_TEMPLATE_GROUP,
+    createTemplateGroup,
+  ));
 
-  const removeTemplateGroupCmd = vscode.commands.registerCommand(
-    REMOVE_TEMPLATE_GROUP_COMMAND_ID,
+  context.subscriptions.push(commands.registerCommand(
+    COMMANDS.EDIT_TEMPLATE_GROUP_METADATA,
+    editTemplateGroupMetadata,
+  ));
+
+  context.subscriptions.push(commands.registerCommand(
+    COMMANDS.REMOVE_TEMPLATE_GROUP,
     removeTemplateGroup,
-  );
+  ));
 
-  const createNewFileFromTemplateCmd = vscode.commands.registerCommand(
-    CREATE_FILE_FROM_TEMPLATE_COMMAND_ID,
-    createNewFileFromTemplate,
-  );
+  context.subscriptions.push(commands.registerCommand(
+    COMMANDS.CREATE_FILE_FROM_TEMPLATE,
+    createFileFromTemplate,
+  ));
 
-  const createNewFilesFromTemplateGroupCmd = vscode.commands.registerCommand(
-    CREATE_FILES_FROM_TEMPLATE_GROUP_COMMAND_ID,
-    createNewFilesFromTemplateGroup,
-  );
-
-  context.subscriptions.push(createNewFileTemplateCmd);
-  context.subscriptions.push(editFileTemplateCmd);
-  context.subscriptions.push(removeFileTemplateCmd);
-  context.subscriptions.push(createNewTemplateGroupCmd);
-  context.subscriptions.push(editTemplateGroupCmd);
-  context.subscriptions.push(removeTemplateGroupCmd);
-  context.subscriptions.push(createNewFileFromTemplateCmd);
-  context.subscriptions.push(createNewFilesFromTemplateGroupCmd);
+  context.subscriptions.push(commands.registerCommand(
+    COMMANDS.CREATE_FILES_FROM_TEMPLATE_GROUP,
+    createFilesFromTemplateGroup,
+  ));
 }
 
-// this method is called when your extension is deactivated
+// This method is called when your extension is deactivated.
 export function deactivate(): void {
   setExtensionContext(null);
 }
