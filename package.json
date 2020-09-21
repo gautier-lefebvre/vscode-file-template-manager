@@ -51,7 +51,7 @@
       },
       {
         "command": "file-template-manager.editTemplateGroupMetadata",
-        "title": "[File template manager] Edit a file template group"
+        "title": "[File template manager] Edit a file template group metadata"
       },
       {
         "command": "file-template-manager.removeTemplateGroup",

@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.0]
+### Changed
+- Rewrote everything from scratch. You will lose your file templates because I changed how they are defined and stored.
+
+### Added
+- Global and local file templates and file template groups.
+- Variables in template file names.
+- More variables in file templates.
+
 ## [0.2.0]
 ### Added
 - When the extension prompts to select a template, the extension is displayed next to the name.
