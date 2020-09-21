@@ -208,7 +208,7 @@ export async function promptUserForTemplatesVariablesValues(
 
       const templatesVariableUsage = templates.map((t) => ({
         template: t,
-        usesVariable: variablesInTemplates[template.metadata.id].includes(varName),
+        usesVariable: variablesInTemplates[t.metadata.id].includes(varName),
       }));
 
       const fileTemplateNames = !templatesUseSameVariables
