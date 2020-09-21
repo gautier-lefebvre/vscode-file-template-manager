@@ -1,4 +1,4 @@
-export const CONFIG_FILE_MODULE_NAME = 'file-template-manager';
+export const CONFIG_FILE_MODULE_NAME = 'filetemplatemanager';
 
 export const OUTPUT_CHANNEL_NAME = 'File Template Manager';
 
