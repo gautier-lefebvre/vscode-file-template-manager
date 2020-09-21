@@ -1,5 +1,5 @@
 import { TextDecoder, TextEncoder } from 'util';
-import { basename, extname } from 'path';
+import { basename } from 'path';
 
 import { Uri, workspace } from 'vscode';
 import ejs from 'ejs';
@@ -40,7 +40,7 @@ export const renderFile = async (
     timestamp: new Date().toISOString(),
     relativeFilePath: workspace.asRelativePath(fileUri, false),
     fileName: basename(fileUri.path),
-    baseFileName: basename(fileUri.path, extname(fileUri.path)),
+    baseFileName: basename(fileUri.path).split('.')[0],
   };
 
   const generatedFileContent = await ejs.render(
