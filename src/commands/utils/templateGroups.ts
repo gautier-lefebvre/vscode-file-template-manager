@@ -206,13 +206,16 @@ export async function promptUserForTemplatesVariablesValues(
 
       if (value !== undefined) { continue; }
 
-      const templatesWithVariable = !templatesUseSameVariables
-        ? [template]
-        : templates
-          .filter(({ metadata: { id } }) => variablesInTemplates[id].includes(varName));
+      const templatesVariableUsage = templates.map((t) => ({
+        template: t,
+        usesVariable: variablesInTemplates[template.metadata.id].includes(varName),
+      }));
 
-      const fileTemplateNames = templatesWithVariable
-        .map(({ metadata }) => metadata.fileTemplateName);
+      const fileTemplateNames = !templatesUseSameVariables
+        ? [template.metadata.fileTemplateName]
+        : templatesVariableUsage
+          .filter(({ usesVariable }) => !!usesVariable)
+          .map(({ template: { metadata } }) => metadata.fileTemplateName);
 
       const variableValue = await window.showInputBox({
         placeHolder: `What is the value of '${varName}'?`,
@@ -227,6 +230,12 @@ export async function promptUserForTemplatesVariablesValues(
         });
       } else {
         variablesValues[template.metadata.id][varName] = variableValue;
+
+        templatesVariableUsage
+          .filter(({ usesVariable }) => !usesVariable)
+          .forEach(({ template: { metadata: { id } } }) => {
+            variablesValues[id][varName] = variableValue;
+          });
       }
     }
   }
