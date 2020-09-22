@@ -1,5 +1,7 @@
 # File Template Manager for Visual Studio Code
 
+[See on the VSCode marketplace](https://marketplace.visualstudio.com/items?itemName=gautier-lfbvr.file-template-manager).
+
 This is an extension for Visual Studio Code to manage file templates and create new files from said templates.
 
 I created this because as a React developer, I was tired of always having to manually create the same files over and over again. To fix this, I spent a lot more time writing an extension than I would ever have lost creating the files manually. Oh well.
