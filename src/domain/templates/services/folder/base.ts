@@ -1,9 +1,9 @@
-import { basename, dirname, join } from 'path';
+import { basename, dirname } from 'path';
 import { TextDecoder, TextEncoder } from 'util';
 
 import slugify from 'slugify';
 import {
-  RelativePattern,
+  FileType,
   Uri,
   window,
   workspace,
@@ -11,10 +11,9 @@ import {
 
 import {
   TEMPLATES_FOLDER,
-  TEMPLATES_GLOB_PATTERN,
   TEMPLATE_CONTENT_PLACEHOLDER,
   TEMPLATE_GROUPS_FOLDER,
-  TEMPLATE_GROUPS_GLOB_PATTERN,
+  TEMPLATE_GROUP_METADATA_EXT,
   TEMPLATE_METADATA_FILENAME,
 } from '../../../../constants';
 import { logger } from '../../../../services/logger';
@@ -99,10 +98,12 @@ export abstract class FolderTemplatesService implements IFolderTemplatesService 
     } catch (err) {
       delete this.templatesCache[id];
 
-      logger.appendLine(err);
+      if (err.code !== 'FileNotFound') {
+        logger.appendLine(err);
 
-      // Show warning and abort.
-      window.showWarningMessage(`Could not load metadata in template folder ${templateFolderUri.path}. Template is omitted.`);
+        // Show warning and abort.
+        window.showWarningMessage(`Could not load metadata in template folder ${templateFolderUri.path}. Template is omitted.`);
+      }
 
       return undefined;
     }
@@ -112,7 +113,7 @@ export abstract class FolderTemplatesService implements IFolderTemplatesService 
     folderConfiguration: FolderConfiguration,
     metadataFileUri: Uri,
   ): Promise<TemplateGroup | undefined> {
-    const id = basename(metadataFileUri.path, '.json');
+    const id = basename(metadataFileUri.path, TEMPLATE_GROUP_METADATA_EXT);
 
     try {
       const { mtime } = await workspace.fs.stat(metadataFileUri);
@@ -148,10 +149,12 @@ export abstract class FolderTemplatesService implements IFolderTemplatesService 
     } catch (err) {
       delete this.templateGroupsCache[id];
 
-      logger.appendLine(err);
+      if (err !== 'FileNotFound') {
+        logger.appendLine(err);
 
-      // Show warning and abort.
-      window.showWarningMessage(`Could not load template group metadata file at ${metadataFileUri.path}. Template group is omitted.`);
+        // Show warning and abort.
+        window.showWarningMessage(`Could not load template group metadata file at ${metadataFileUri.path}. Template group is omitted.`);
+      }
 
       return undefined;
     }
@@ -176,80 +179,84 @@ export abstract class FolderTemplatesService implements IFolderTemplatesService 
   public async getTemplates(): Promise<ReadonlyArray<Template>> {
     const folderConfiguration = await this.getFolderConfiguration();
 
-    const templatesMetadataFiles = await workspace.findFiles(
-      new RelativePattern(
-        this.folderUri.fsPath,
-        join(folderConfiguration.templatesFolderPath, TEMPLATES_GLOB_PATTERN)
-          .replace(/\\+/g, '/'),
-      ),
-    );
+    try {
+      const folderNames = (
+        await workspace.fs.readDirectory(Uri.joinPath(
+          this.folderUri,
+          folderConfiguration.templatesFolderPath,
+          TEMPLATES_FOLDER,
+        ))
+      ).filter(([, fileType]) => fileType === FileType.Directory);
 
-    const templates = await Promise.all(templatesMetadataFiles.map(
-      (metadataFileUri) => this.loadTemplate(
-        folderConfiguration,
-        metadataFileUri,
-      ),
-    ));
+      const templatesMetadataFiles = await Promise.all(
+        folderNames.map(async ([id]) => (
+          this.getTemplateMetadataFileUri(id, folderConfiguration)
+        )),
+      );
 
-    return compact(templates);
+      const templates = await Promise.all(templatesMetadataFiles.map(
+        (metadataFileUri) => this.loadTemplate(
+          folderConfiguration,
+          metadataFileUri,
+        ),
+      ));
+
+      return compact(templates);
+    } catch (err) {
+      if (err.code !== 'FileNotFound') { throw err; }
+
+      return [];
+    }
   }
 
   public async getTemplateById(id: string): Promise<Template | undefined> {
     const folderConfiguration = await this.getFolderConfiguration();
     const metadataFileUri = await this.getTemplateMetadataFileUri(id, folderConfiguration);
-
-    try {
-      await workspace.fs.stat(metadataFileUri);
-    } catch (err) {
-      switch (err) {
-        case 'FileNotFound':
-          return undefined;
-        default:
-          logger.appendLine(err);
-          return undefined;
-      }
-    }
-
     return this.loadTemplate(folderConfiguration, metadataFileUri);
   }
 
   public async getTemplateGroups(): Promise<ReadonlyArray<TemplateGroup>> {
     const folderConfiguration = await this.getFolderConfiguration();
 
-    const templateGroupsMetadataFiles = await workspace.findFiles(
-      new RelativePattern(
-        this.folderUri.fsPath,
-        join(folderConfiguration.templatesFolderPath, TEMPLATE_GROUPS_GLOB_PATTERN)
-          .replace(/\\+/g, '/'),
-      ),
-    );
+    try {
+      const templateGroupsMetadataFilesStat = (
+        await workspace.fs.readDirectory(Uri.joinPath(
+          this.folderUri,
+          folderConfiguration.templatesFolderPath,
+          TEMPLATE_GROUPS_FOLDER,
+        ))
+      ).filter(([fileName, fileType]) => (
+        fileType === FileType.File
+        && fileName.endsWith(TEMPLATE_GROUP_METADATA_EXT)
+      ));
 
-    const templateGroups = await Promise.all(templateGroupsMetadataFiles.map(
-      (metadataFileUri) => this.loadTemplateGroup(
-        folderConfiguration,
-        metadataFileUri,
-      ),
-    ));
+      const templateGroupsMetadataFilesUri = await Promise.all(
+        templateGroupsMetadataFilesStat.map(([fileName]) => (
+          this.getTemplateGroupMetadataFileUri(
+            basename(fileName, TEMPLATE_GROUP_METADATA_EXT),
+            folderConfiguration,
+          )
+        )),
+      );
 
-    return compact(templateGroups);
+      const templateGroups = await Promise.all(templateGroupsMetadataFilesUri.map(
+        (metadataFileUri) => this.loadTemplateGroup(
+          folderConfiguration,
+          metadataFileUri,
+        ),
+      ));
+
+      return compact(templateGroups);
+    } catch (err) {
+      if (err.code !== 'FileNotFound') { throw err; }
+
+      return [];
+    }
   }
 
   public async getTemplateGroupById(id: string): Promise<TemplateGroup | undefined> {
     const folderConfiguration = await this.getFolderConfiguration();
     const metadataFileUri = await this.getTemplateGroupMetadataFileUri(id, folderConfiguration);
-
-    try {
-      await workspace.fs.stat(metadataFileUri);
-    } catch (err) {
-      switch (err) {
-        case 'FileNotFound':
-          return undefined;
-        default:
-          logger.appendLine(err);
-          return undefined;
-      }
-    }
-
     return this.loadTemplateGroup(folderConfiguration, metadataFileUri);
   }
 
