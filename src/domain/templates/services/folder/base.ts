@@ -50,14 +50,29 @@ export interface IFolderTemplatesService {
 export abstract class FolderTemplatesService implements IFolderTemplatesService {
   public readonly folderUri: Uri;
 
-  private static async loadTemplate(
+  private templatesCache:
+  { [id: string]: { template: Template, mtime: number } }
+  = {};
+
+  private templateGroupsCache
+  : { [id: string]: { templateGroup: TemplateGroup, mtime: number } }
+  = {};
+
+  private async loadTemplate(
     folderConfiguration: FolderConfiguration,
     metadataFileUri: Uri,
   ): Promise<Template | undefined> {
     const templateFolderUri = Uri.parse(dirname(metadataFileUri.path));
-    const templateFolderName = basename(templateFolderUri.path);
+    const id = basename(templateFolderUri.path);
 
     try {
+      const { mtime } = await workspace.fs.stat(metadataFileUri);
+
+      // If cache is still valid, return cache.
+      if (mtime === this.templatesCache[id]?.mtime) {
+        return this.templatesCache[id].template;
+      }
+
       // Read and parse metadata file.
       const content = await workspace.fs.readFile(metadataFileUri);
       const parsedMetadata = JSON.parse(new TextDecoder('utf-8').decode(content));
@@ -69,15 +84,21 @@ export abstract class FolderTemplatesService implements IFolderTemplatesService 
         throw Error('Template metadata did not match schema');
       }
 
-      return new Template(
+      const template = new Template(
         folderConfiguration,
         templateFolderUri,
         new TemplateMetadata({
           ...parsedMetadata,
-          id: templateFolderName,
+          id,
         }),
       );
+
+      this.templatesCache[id] = { template, mtime };
+
+      return template;
     } catch (err) {
+      delete this.templatesCache[id];
+
       logger.appendLine(err);
 
       // Show warning and abort.
@@ -87,13 +108,20 @@ export abstract class FolderTemplatesService implements IFolderTemplatesService 
     }
   }
 
-  private static async loadTemplateGroup(
+  private async loadTemplateGroup(
     folderConfiguration: FolderConfiguration,
     metadataFileUri: Uri,
   ): Promise<TemplateGroup | undefined> {
     const id = basename(metadataFileUri.path, '.json');
 
     try {
+      const { mtime } = await workspace.fs.stat(metadataFileUri);
+
+      // If cache is still valid, return cache.
+      if (mtime === this.templateGroupsCache[id]?.mtime) {
+        return this.templateGroupsCache[id].templateGroup;
+      }
+
       // Read and parse metadata file.
       const content = await workspace.fs.readFile(metadataFileUri);
       const parsedMetadata = JSON.parse(new TextDecoder('utf-8').decode(content));
@@ -105,7 +133,7 @@ export abstract class FolderTemplatesService implements IFolderTemplatesService 
         throw Error('Template group metadata did not match schema');
       }
 
-      return new TemplateGroup(
+      const templateGroup = new TemplateGroup(
         folderConfiguration,
         metadataFileUri,
         new TemplateGroupMetadata({
@@ -113,7 +141,13 @@ export abstract class FolderTemplatesService implements IFolderTemplatesService 
           id,
         }),
       );
+
+      this.templateGroupsCache[id] = { templateGroup, mtime };
+
+      return templateGroup;
     } catch (err) {
+      delete this.templateGroupsCache[id];
+
       logger.appendLine(err);
 
       // Show warning and abort.
@@ -151,7 +185,7 @@ export abstract class FolderTemplatesService implements IFolderTemplatesService 
     );
 
     const templates = await Promise.all(templatesMetadataFiles.map(
-      (metadataFileUri) => FolderTemplatesService.loadTemplate(
+      (metadataFileUri) => this.loadTemplate(
         folderConfiguration,
         metadataFileUri,
       ),
@@ -176,7 +210,7 @@ export abstract class FolderTemplatesService implements IFolderTemplatesService 
       }
     }
 
-    return FolderTemplatesService.loadTemplate(folderConfiguration, metadataFileUri);
+    return this.loadTemplate(folderConfiguration, metadataFileUri);
   }
 
   public async getTemplateGroups(): Promise<ReadonlyArray<TemplateGroup>> {
@@ -191,7 +225,7 @@ export abstract class FolderTemplatesService implements IFolderTemplatesService 
     );
 
     const templateGroups = await Promise.all(templateGroupsMetadataFiles.map(
-      (metadataFileUri) => FolderTemplatesService.loadTemplateGroup(
+      (metadataFileUri) => this.loadTemplateGroup(
         folderConfiguration,
         metadataFileUri,
       ),
@@ -216,7 +250,7 @@ export abstract class FolderTemplatesService implements IFolderTemplatesService 
       }
     }
 
-    return FolderTemplatesService.loadTemplateGroup(folderConfiguration, metadataFileUri);
+    return this.loadTemplateGroup(folderConfiguration, metadataFileUri);
   }
 
   public async createTemplate(templateToCreate: TemplateToCreate): Promise<Template> {
