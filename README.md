@@ -91,10 +91,10 @@ This one is for editing the information that you gave when you created a file te
 #### Delete an existing template
 
 1. Open the command palette (`ctrl+shift+p` on Windows).
-2. Select `[File template manager] Remove a file template`.
+1. Select `[File template manager] Remove a file template`.
 1. Select where the file template you want to remove is stored. It is where you chose to store it when you created it.
-3. Select the template to remove.
-4. Press `F` to pay respect.
+1. Select the template to remove.
+1. Press `F` to pay respect.
 
 ### File template groups
 
@@ -124,10 +124,10 @@ This one is for editing the information that you gave when you created a file te
 #### Delete an existing file template group
 
 1. Open the command palette (`ctrl+shift+p` on Windows).
-2. Select `[File template manager] Remove a file template group`.
+1. Select `[File template manager] Remove a file template group`.
 1. Select where the file template group you want to edit is stored. It is where you chose to store it when you created it.
-3. Select the template group to remove.
-4. Press `F` to pay respect.
+1. Select the template group to remove.
+1. Press `F` to pay respect.
 
 ### Use your templates
 
@@ -170,17 +170,23 @@ You can create a local configuration for the file template manager so you can de
 
 ### Write the configuration
 
-We use [`cosmiconfig`](https://www.npmjs.com/package/cosmiconfig) with the module name `filetemplatemanager` to load the configuration, so go check out their documentation to know where you can write it.
+We use [`cosmiconfig`](https://www.npmjs.com/package/cosmiconfig) with the module name `filetemplatemanager` to load the configuration, so go check out their documentation to know where you can write it. It only looks inside the current folder.
 
-**TL;DR**: You can add a `.filetemplatemanagerrc.json` file at the root of your workspace folder.
+**TL;DR**: You can add a `.filetemplatemanagerrc.json` file at the root of your workspace folder. If you want JS, you can use `.filetemplatemanagerrc.js`, and export the config from that module.
+
+You can also use the following command. It initializes the configuration if it does not exist for the selected folder:
+1. Open the command palette (`ctrl+shift+p` on Windows).
+1. Select `[File template manager] Edit the configuration of a folder of the workspace`.
+1. If you already had a configuration, it will open, otherwise, it will initialize it with the defaults and open it (as a JSON file).
 
 ### Global configuration
 
-*TODO: For now if you want to create a global configuration, you need to manually add the configuration in your extension storage folder (in `AppData/Roaming/Code/User/globalStorage/gautier-lfbvr.file-template-manager`).*
+As for workspace folders, the configuration file can be initialized by using the `edit` command:
+1. Open the command palette (`ctrl+shift+p` on Windows).
+1. Select `[File template manager] Edit global configuration`.
+1. If you already had a configuration, it will open, otherwise, it will initialize it with the defaults and open it (as a JSON file).
 
 NB: the `templatesFolderPath` key is ignored. For the global file templates, the folder will always be `'.templates/'`.
-
-I will add a command to generate it soon.
 
 ## Template file name
 
