@@ -21,7 +21,7 @@ export const getFoldersQuickPickItems = (
   {
     folderType: FolderType.Global,
     label: globalFolderName,
-    description: globalFolderDescription,
+    detail: globalFolderDescription,
   },
 
   ...(workspace.workspaceFolders || []).map(
@@ -29,7 +29,7 @@ export const getFoldersQuickPickItems = (
       workspaceFolder,
       folderType: FolderType.WorkspaceFolder,
       label: workspaceFolder.name,
-      description: workspaceFolderDescription,
+      detail: workspaceFolderDescription,
     }),
   ),
 ];

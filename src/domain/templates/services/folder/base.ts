@@ -293,6 +293,25 @@ export abstract class FolderTemplatesService implements IFolderTemplatesService 
   }
 
   public async removeTemplate(templateFolderUri: Uri): Promise<void> {
+    const id = basename(templateFolderUri.path);
+
+    const templateGroups = await this.getTemplateGroups();
+
+    // Remove the template from all template groups that use the it.
+    await Promise.all(
+      templateGroups.map(async (templateGroup) => {
+        if (templateGroup.metadata.templates.includes(id)) {
+          await this.editTemplateGroup(
+            templateGroup.metadataFileUri,
+            {
+              ...templateGroup.metadata,
+              templates: templateGroup.metadata.templates.filter((templateId) => templateId !== id),
+            },
+          );
+        }
+      }),
+    );
+
     await workspace.fs.delete(templateFolderUri, { recursive: true, useTrash: true });
   }
 

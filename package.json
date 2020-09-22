@@ -56,6 +56,14 @@
       {
         "command": "file-template-manager.removeTemplateGroup",
         "title": "[File template manager] Remove a file template group"
+      },
+      {
+        "command": "file-template-manager.editGlobalConfiguration",
+        "title": "[File template manager] Edit global configuration"
+      },
+      {
+        "command": "file-template-manager.editWorkspaceFolderConfiguration",
+        "title": "[File template manager] Edit the configuration of a folder of the workspace"
       }
     ],
     "menus": {

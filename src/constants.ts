@@ -12,17 +12,17 @@ export const COMMANDS = {
   REMOVE_TEMPLATE_GROUP: 'file-template-manager.removeTemplateGroup',
   CREATE_FILE_FROM_TEMPLATE: 'file-template-manager.createFileFromTemplate',
   CREATE_FILES_FROM_TEMPLATE_GROUP: 'file-template-manager.createFilesFromTemplateGroup',
+  EDIT_GLOBAL_CONFIGURATION: 'file-template-manager.editGlobalConfiguration',
+  EDIT_WORKSPACE_FOLDER_CONFIGURATION: 'file-template-manager.editWorkspaceFolderConfiguration',
 };
 
 export const DEFAULT_TEMPLATES_FOLDER = '.templates/';
 
 export const TEMPLATES_FOLDER = 'templates/';
+export const TEMPLATE_GROUPS_FOLDER = 'groups/';
 export const TEMPLATE_METADATA_FILENAME = 'meta.json';
 export const TEMPLATE_CONTENT_FILENAME = 'content';
-export const TEMPLATES_GLOB_PATTERN = `${TEMPLATES_FOLDER}/*/${TEMPLATE_METADATA_FILENAME}`;
-
-export const TEMPLATE_GROUPS_FOLDER = 'groups/';
-export const TEMPLATE_GROUPS_GLOB_PATTERN = `${TEMPLATE_GROUPS_FOLDER}/*.json`;
+export const TEMPLATE_GROUP_METADATA_EXT = '.json';
 
 export const TEMPLATE_CONTENT_PLACEHOLDER = `/**
  * This is the content of the template you are creating.

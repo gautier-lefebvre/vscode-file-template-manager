@@ -1,5 +1,6 @@
 import { commands, ExtensionContext } from 'vscode';
 
+import { config } from './domain/config';
 import { setExtensionContext } from './services/extensionContext';
 
 import { COMMANDS } from './constants';
@@ -12,7 +13,8 @@ import { editTemplateGroupMetadata } from './commands/editTemplateGroupMetadata'
 import { removeTemplateGroup } from './commands/removeTemplateGroup';
 import { createFileFromTemplate } from './commands/createFileFromTemplate';
 import { createFilesFromTemplateGroup } from './commands/createFilesFromTemplateGroup';
-import { config } from './domain/config';
+import { editGlobalConfiguration } from './commands/editGlobalConfiguration';
+import { editWorkspaceFolderConfiguration } from './commands/editWorkspaceFolderConfiguration';
 
 export async function activate(context: ExtensionContext): Promise<void> {
   setExtensionContext(context);
@@ -65,6 +67,16 @@ export async function activate(context: ExtensionContext): Promise<void> {
   context.subscriptions.push(commands.registerCommand(
     COMMANDS.CREATE_FILES_FROM_TEMPLATE_GROUP,
     createFilesFromTemplateGroup,
+  ));
+
+  context.subscriptions.push(commands.registerCommand(
+    COMMANDS.EDIT_GLOBAL_CONFIGURATION,
+    editGlobalConfiguration,
+  ));
+
+  context.subscriptions.push(commands.registerCommand(
+    COMMANDS.EDIT_WORKSPACE_FOLDER_CONFIGURATION,
+    editWorkspaceFolderConfiguration,
   ));
 }
 

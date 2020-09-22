@@ -1,3 +1,5 @@
+import { TextEncoder } from 'util';
+
 import { cosmiconfig } from 'cosmiconfig';
 import {
   Disposable,
@@ -16,11 +18,6 @@ import {
   RawWorkspaceFolderConfiguration,
 } from './types';
 
-const configurationFileExplorer = cosmiconfig(
-  CONFIG_FILE_MODULE_NAME,
-  { cache: false },
-);
-
 type FileCache = {
   filePath: string,
   mtime: number,
@@ -33,6 +30,16 @@ class ConfigurationService {
   private globalFolderCache: FileCache | null = null;
 
   private workspaceFoldersWatcher: Disposable | null = null;
+
+  private static getCosmiconfig(folderUri: Uri) {
+    return cosmiconfig(
+      CONFIG_FILE_MODULE_NAME,
+      {
+        cache: false,
+        stopDir: folderUri.fsPath,
+      },
+    );
+  }
 
   public watch() {
     this.workspaceFoldersWatcher?.dispose();
@@ -136,6 +143,33 @@ class ConfigurationService {
     return folderConfiguration;
   }
 
+  /**
+   * Init the global configuration and return the file path if not found.
+   * If found, simply return the configuration path.
+   */
+  public async getWorkspaceFolderConfigurationFilePath(folderUri: Uri): Promise<Uri> {
+    return this.initConfiguration(
+      folderUri,
+      {
+        templatesFolderPath: DEFAULT_TEMPLATES_FOLDER,
+        variables: {},
+      },
+    );
+  }
+
+  /**
+   * Init the global configuration and return the file path if not found.
+   * If found, simply return the configuration path.
+   */
+  public async getGlobalFolderConfigurationFilePath(): Promise<Uri> {
+    return this.initConfiguration(
+      getExtensionContext().globalStorageUri,
+      {
+        variables: {},
+      },
+    );
+  }
+
   private async useCache(
     fileCache: FileCache | null | undefined,
     clearCache: () => void,
@@ -178,9 +212,36 @@ class ConfigurationService {
     }
   }
 
+  private async initConfiguration<T extends RawFolderConfiguration>(
+    folderUri: Uri,
+    defaultConfiguration: T,
+  ): Promise<Uri> {
+    const { filepath } = (
+      await ConfigurationService
+        .getCosmiconfig(folderUri)
+        .search(folderUri.fsPath)
+    ) || {};
+
+    if (filepath) { return Uri.file(filepath); }
+
+    const fileUri = Uri.joinPath(folderUri, `.${CONFIG_FILE_MODULE_NAME}rc.json`);
+
+    await workspace.fs.writeFile(
+      fileUri,
+      new TextEncoder().encode(`${JSON.stringify(defaultConfiguration, null, 2)}\n`),
+    );
+
+    return fileUri;
+  }
+
   private async readConfiguration<T extends RawFolderConfiguration>(folderUri: Uri)
-    :Promise<{ filePath: string | undefined, config: T }> {
-    const { config, filepath } = await configurationFileExplorer.search(folderUri.fsPath) || {};
+    : Promise<{ filePath: string | undefined, config: T }> {
+    const { config, filepath } = await (
+      ConfigurationService
+        .getCosmiconfig(folderUri)
+        .search(folderUri.fsPath)
+    ) || {};
+
     return {
       filePath: filepath,
       config: config || {} as T,
