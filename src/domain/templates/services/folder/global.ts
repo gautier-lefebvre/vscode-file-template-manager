@@ -1,5 +1,5 @@
 import { getExtensionContext } from '../../../../services/extensionContext';
-import { getGlobalFolderConfiguration } from '../../../config';
+import { config } from '../../../config';
 import { FolderConfiguration } from '../../../config/types';
 import { FolderTemplatesService } from './base';
 
@@ -9,6 +9,6 @@ export class GlobalFolderTemplatesService extends FolderTemplatesService {
   }
 
   public async getFolderConfiguration(): Promise<FolderConfiguration> {
-    return getGlobalFolderConfiguration();
+    return config.getGlobalFolderConfiguration();
   }
 }

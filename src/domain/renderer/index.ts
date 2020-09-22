@@ -4,7 +4,7 @@ import { basename } from 'path';
 import { Uri, workspace } from 'vscode';
 import ejs from 'ejs';
 
-import { getGlobalFolderConfiguration, getWorkspaceFolderConfiguration } from '../config';
+import { config } from '../config';
 import { Template } from '../templates/data/template';
 
 /**
@@ -27,8 +27,8 @@ export const renderFile = async (
     workspaceFolderConfiguration,
     templateContent,
   ] = await Promise.all([
-    getGlobalFolderConfiguration(),
-    getWorkspaceFolderConfiguration(workspaceFolder.uri),
+    config.getGlobalFolderConfiguration(),
+    config.getWorkspaceFolderConfiguration(workspaceFolder.uri),
     workspace.fs.readFile(template.contentFileUri),
   ]);
 
