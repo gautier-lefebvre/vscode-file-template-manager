@@ -1,8 +1,8 @@
 {
   "name": "file-template-manager",
   "displayName": "File template manager",
-  "description": "File template management",
-  "version": "0.3.0",
+  "description": "Create files from templates",
+  "version": "0.4.0",
   "publisher": "gautier-lfbvr",
   "homepage": "https://github.com/gautier-lefebvre/vscode-file-template-manager#readme",
   "repository": {
@@ -18,7 +18,12 @@
   "activationEvents": [
     "*"
   ],
-  "main": "./out/extension.js",
+  "keywords": [
+    "Template",
+    "File template",
+    "File template manager"
+  ],
+  "main": "./dist/extension.js",
   "contributes": {
     "commands": [
       {
@@ -63,7 +68,7 @@
       },
       {
         "command": "file-template-manager.editWorkspaceFolderConfiguration",
-        "title": "[File template manager] Edit the configuration of a folder of the workspace"
+        "title": "[File template manager] Edit workspace folder configuration"
       }
     ],
     "menus": {
@@ -92,10 +97,11 @@
     }
   },
   "scripts": {
-    "vscode:prepublish": "yarn run compile",
-    "compile": "tsc -p ./",
+    "vscode:prepublish": "webpack --mode production",
+    "compile": "webpack --mode development",
+    "test-compile": "tsc -p ./",
     "lint": "eslint src --ext ts",
-    "watch": "tsc -watch -p ./",
+    "watch": "webpack --mode development --watch",
     "pretest": "yarn run compile && yarn run lint",
     "test": "node ./out/test/runTest.js"
   },
@@ -107,19 +113,22 @@
     "@types/vscode": "^1.49.0",
     "@typescript-eslint/eslint-plugin": "^4.1.0",
     "@typescript-eslint/parser": "^4.1.0",
+    "ajv": "^6.12.5",
+    "ejs": "^3.1.5",
+    "escape-string-regexp": "^4.0.0",
     "eslint": "^7.9.0",
     "eslint-config-airbnb-typescript": "^10.0.0",
     "eslint-plugin-import": "^2.22.0",
     "glob": "^7.1.6",
     "mocha": "^8.1.3",
+    "slugify": "^1.4.5",
+    "ts-loader": "^8.0.4",
     "typescript": "^4.0.2",
-    "vscode-test": "^1.4.0"
+    "vscode-test": "^1.4.0",
+    "webpack": "^4.44.2",
+    "webpack-cli": "^3.3.12"
   },
   "dependencies": {
-    "ajv": "^6.12.5",
-    "cosmiconfig": "^7.0.0",
-    "ejs": "^3.1.5",
-    "escape-string-regexp": "^4.0.0",
-    "slugify": "^1.4.5"
+    "cosmiconfig": "^7.0.0"
   }
 }

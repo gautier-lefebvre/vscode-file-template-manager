@@ -32,7 +32,9 @@
     "@typescript-eslint/semi": "error",
     "no-undef": "error",
 
+    "import/no-extraneous-dependencies": ["error", {"devDependencies": true }],
     "import/prefer-default-export": "off",
+
     "class-methods-use-this": "off",
     "no-await-in-loop": "off",
     "no-continue": "off",
@@ -48,7 +50,6 @@
         "mocha": true
       },
       "rules": {
-        "import/no-extraneous-dependencies": ["error", { "devDependencies": true }],
         "no-console": "off"
       }
     }

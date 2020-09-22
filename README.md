@@ -176,7 +176,7 @@ We use [`cosmiconfig`](https://www.npmjs.com/package/cosmiconfig) with the modul
 
 You can also use the following command. It initializes the configuration if it does not exist for the selected folder:
 1. Open the command palette (`ctrl+shift+p` on Windows).
-1. Select `[File template manager] Edit the configuration of a folder of the workspace`.
+1. Select `[File template manager] Edit workspace folder configuration`.
 1. If you already had a configuration, it will open, otherwise, it will initialize it with the defaults and open it (as a JSON file).
 
 ### Global configuration
