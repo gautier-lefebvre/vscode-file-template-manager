@@ -12,9 +12,13 @@ import { editTemplateGroupMetadata } from './commands/editTemplateGroupMetadata'
 import { removeTemplateGroup } from './commands/removeTemplateGroup';
 import { createFileFromTemplate } from './commands/createFileFromTemplate';
 import { createFilesFromTemplateGroup } from './commands/createFilesFromTemplateGroup';
+import { config } from './domain/config';
 
 export async function activate(context: ExtensionContext): Promise<void> {
   setExtensionContext(context);
+
+  // Remove unnecessary caches when workspace folders change.
+  config.watch();
 
   // Register all command handlers.
 
@@ -66,5 +70,7 @@ export async function activate(context: ExtensionContext): Promise<void> {
 
 // This method is called when your extension is deactivated.
 export function deactivate(): void {
+  config.dispose();
+
   setExtensionContext(null);
 }
