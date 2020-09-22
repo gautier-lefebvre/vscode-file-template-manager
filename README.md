@@ -1,20 +1,110 @@
-# Visual Studio Code File Template Manager Extension
+# File Template Manager for Visual Studio Code
 
 This is an extension for Visual Studio Code to manage file templates and create new files from said templates.
+
+I created this because as a React developer, I was tired of always having to manually create the same files over and over again. To fix this, I spent a lot more time writing an extension than I would ever have lost creating the files manually. Oh well.
 
 ## Disclaimer
 
 This is still in alpha so do not be surprised if you experience bugs.
 
-The first stable release will be 1.0.0. In the meantime, **be aware that you may lose your templates when upgrading**.
+The first stable release will be 1.0.0. In the meantime, **be aware that you may lose your templates when upgrading**. This seems highly unlikely now though.
 
 ## Features
 
-1. Create file templates.
-2. Create new files from file templates.
-3. Create groups of file templates to generate multiple files from a single command.
-4. Also in the future, directly select the template in the explorer context menu. I'm waiting for
-Visual Studio Code to support dynamic contribution to the context menu for that one.
+This is an overview of the features. For more detailed information, keep scrolling.
+
+### File templates
+
+Create file templates using the `[File template manager] Create a new file template` command in the command palette (`ctrl`+`shift`+`p`). You will follow a simple wizard 🧙 to register a file template.
+
+File templates are written using [ejs](https://ejs.co/) format. This gives you more flexibility to interact with variables in the template.
+
+For example, you may create a file template with the following manifest and content:
+
+```json
+{
+  "name": "React component",
+  "fileTemplateName": "{{name}}.jsx"
+}
+```
+
+```jsx
+// Created on <%= timestamp %>.
+import React, { memo } from 'react';
+
+export const <%= baseFileName %>Base = () => (
+  <div />
+);
+
+<%= baseFileName %>Base.displayName = '<%= baseFileName %>';
+
+<%= baseFileName %>Base.propTypes = {
+
+};
+
+<%= baseFileName %>Base.defaultProps = {
+
+};
+
+export default memo(<%= baseFileName %>Base);
+```
+
+You can now create files from the template by right-clicking a folder in your open folder and selecting `New file from template`.
+
+Using `React component` (created above) and specifying `name` as `MyComponent` when the extension prompts you, this creates a file `MyComponent.jsx` with the following content:
+
+```jsx
+// Created on 2020-09-22T14:25:17.095Z.
+import React, { memo } from 'react';
+
+export const MyComponentBase = () => (
+  <div />
+);
+
+MyComponentBase.displayName = 'MyComponent';
+
+MyComponentBase.propTypes = {
+
+};
+
+MyComponentBase.defaultProps = {
+
+};
+
+export default memo(MyComponentBase);
+```
+
+### File template groups
+
+Additionally, you can define groups of templates, which allow you to generate multiple files from a single command.
+
+For example, you can define 3 templates:
+
+- **React component**: `{{name}}.jsx`.
+- **React component scss module**: `{{name}}.module.scss`.
+- **React component stories**: `{{name}}.stories.mdx`.
+
+Then group these 3 templates inside a group `React component group`.
+
+You may now use `React component group`, set `name` to `MyComponent` when the extension prompts you, which will create the files `MyComponent.jsx`, `MyComponent.module.scss` and `MyComponent.stories.mdx`, with the content of each template.
+
+### Global / Local templates
+
+Templates and groups can either be registered globally or locally.
+
+- **Globally**: Templates and groups are stored in the extension global storage folder.
+  - They will be available for use in any project you open with VSCode.
+  - This is useful if you have multiple unrelated projects with the same technologies.
+- **Locally**: Local templates and groups are stored in your project folder (or any project folder of your workspace if you use [multi-root workspaces](https://code.visualstudio.com/docs/editor/multi-root-workspaces)).
+  - They will only be available when creating files in that specific project folder.
+  - This is useful if you want to share the templates with your project team, and version them (the templates, not your colleagues).
+
+Groups can only link templates within the same folder (global or local).
+
+### Use templates from the explorer context menu
+
+In the future, you will be able to select your templates from the explorer context menu. Unfortunately, this is not supported yet by the VSCode Extension API.
 
 <!-- ## Extension Settings
 
@@ -37,43 +127,16 @@ Your file template content will not have syntax highlighting. In the future, you
 
 #### Create a new file template
 
-1. Open the command palette (`ctrl+shift+p` on Windows).
-1. Select `[File template manager] Create a new file template`.
-1. Choose where you want to store it. It can be either:
-   - A global file template: it can be used on all your projects. It is saved in the extension storage folder.
-   - A local template: it will be stored in one of your currently open workspace folders, and will only be available inside that folder. It can be useful if you want to share the templates with everyone on your team, they just need the extension and are good to go.
+1. Select `[File template manager] Create a new file template` in the command palette (`ctrl`+`shift`+`p`).
+1. Choose where you want to store it. See [Global / Local templates](#global--local-templates) for more information.
 1. Give a name to your template. It does not have to be unique. Example: `React component`.
 1. Specify the file name of your file template. See [Template file name](#template-file-name) for more information.
 1. Specify if your file template can be used outside of a file template group. This can be useful if you know you will never use a file template by itself, but always alongside other file templates.
-1. Your file template content should open in the editor. You can erase the comment (it is just here to give you some information), and type the file template content in the editor. The format of the file template content is [`ejs`](https://ejs.co/). See [Variables in the templates](#variables-in-the-templates) for a list of all variables available when writing your templates. Don't forget to save, it's still just a file.
-
-Example of a file template content:
-```jsx
-import React, { memo } from 'react';
-
-export const <%= baseFileName %>Base = ({
-  ...props
-}) => {
-
-};
-
-<%= baseFileName %>Base.displayName = '<%= baseFileName %>';
-
-<%= baseFileName %>Base.propTypes = {
-
-};
-
-<%= baseFileName %>Base.defaultProps = {
-
-};
-
-export default memo(<%= baseFileName %>Base);
-```
+1. Your file template content should open in the editor. You can erase the comment (it is just here to give you some information), and type the file template content in the editor. The format of the file template content is [`ejs`](https://ejs.co/). See [Variables in the templates](#variables-in-the-templates) for a list of all variables available when writing your templates.
 
 #### Edit an existing template
 
-1. Open the command palette (`ctrl+shift+p` on Windows).
-1. Select `[File template manager] Edit a file template`.
+1. Select `[File template manager] Edit a file template` in the command palette (`ctrl`+`shift`+`p`).
 1. Select where the file template you want to edit is stored. It is where you chose to store it when you created it.
 1. Select the file template to edit.
 1. Edit your file template (and save).
@@ -82,30 +145,23 @@ export default memo(<%= baseFileName %>Base);
 
 This one is for editing the information that you gave when you created a file template.
 
-1. Open the command palette (`ctrl+shift+p` on Windows).
-1. Select `[File template manager] Edit a file template metadata`.
+1. Select `[File template manager] Edit a file template metadata` in the command palette (`ctrl`+`shift`+`p`).
 1. Select where the file template you want to edit is stored. It is where you chose to store it when you created it.
 1. Select the file template to edit.
 1. The inputs are the same as [Create a new file template](#create-a-new-file-template).
 
 #### Delete an existing template
 
-1. Open the command palette (`ctrl+shift+p` on Windows).
-1. Select `[File template manager] Remove a file template`.
+1. Select `[File template manager] Remove a file template` in the command palette (`ctrl`+`shift`+`p`).
 1. Select where the file template you want to remove is stored. It is where you chose to store it when you created it.
 1. Select the template to remove.
 1. Press `F` to pay respect.
 
 ### File template groups
 
-Template groups are a way to group your templates (surprisedpikachu.jpg) to generate multiple files from a single command. For example, you may have a `React component` template and a `React component stories` template, that you need to generate everytime you create a new React component. Instead of doing the [Create a new file from a template](#create-a-new-file-from-a-template) process twice every time, you can define a template group with both templates, and generate both files with [Create new files from a template group](#create-new-files-from-a-template-group).
-
-When creating a file template group, you can only put file templates that are saved in the same folder (i.e. a global file template group can only use global file templates, and a local file template group can only use the local file templates of the same folder).
-
 #### Create a new file template group
 
-1. Open the command palette (`ctrl+shift+p` on Windows).
-1. Select `[File template manager] Create a new file template group`.
+1. Select `[File template manager] Create a new file template group` in the command palette (`ctrl`+`shift`+`p`).
 1. Choose where you want to store it. See [File template groups](#file-template-groups) for more information.
 1. Select the files templates to put in the group.
 1. Give a name to your file template group. It does not have to be unique, but you won't be able to differentiate which is which so you probably should.
@@ -115,16 +171,14 @@ When creating a file template group, you can only put file templates that are sa
 
 This one is for editing the information that you gave when you created a file template group.
 
-1. Open the command palette (`ctrl+shift+p` on Windows).
-1. Select `[File template manager] Edit a file template group metadata`.
+1. Select `[File template manager] Edit a file template group metadata` in the command palette (`ctrl`+`shift`+`p`).
 1. Select where the file template group you want to edit is stored. It is where you chose to store it when you created it.
 1. Select the file template group to edit.
 1. The inputs are the same as [Create a new file template group](#create-a-new-file-template-group).
 
 #### Delete an existing file template group
 
-1. Open the command palette (`ctrl+shift+p` on Windows).
-1. Select `[File template manager] Remove a file template group`.
+1. Select `[File template manager] Remove a file template group` in the command palette (`ctrl`+`shift`+`p`).
 1. Select where the file template group you want to edit is stored. It is where you chose to store it when you created it.
 1. Select the template group to remove.
 1. Press `F` to pay respect.
@@ -151,9 +205,17 @@ This one is for editing the information that you gave when you created a file te
 1. ???
 1. Profit.
 
-## File template manager configuration
+## File template manager folder configuration
 
-You can create a local configuration for the file template manager so you can decide where the templates are stored.
+It is possible to configure your template manager folders (globally and locally), by:
+
+- Manually creating a configuration file at the root of the corresponding folder.
+  - We use [`cosmiconfig`](https://www.npmjs.com/package/cosmiconfig) with the module name `filetemplatemanager` to look **within the folder** (it will not look up the directory tree).
+    - **TL;DR** you can create a `.filetemplatemanagerrc.json` file at the root of your workspace folder.
+  - For the global folder, the configuration file goes inside the extension folder, but you can use the following command to generate it for you.
+- Alternatively, you can use `[File template manager] Edit global configuration` or `File template manager] Edit workspace folder configuration` in the command palette, accordingly. If the configuration file does not exist, it will be created with the default values.
+
+A folder configuration looks like this:
 
 ```json
 {
@@ -165,28 +227,10 @@ You can create a local configuration for the file template manager so you can de
 }
 ```
 
-- **templatesFolderPath** *(string)* - The folder where the file templates and groups are stored. It is relative to the workspace folder root. Default: `'.templates/'`
-- **variables** *{ [key: string]: any }* - A map of variables available in your file templates content. Keys must be a valid JavaScript variable name.
-
-### Write the configuration
-
-We use [`cosmiconfig`](https://www.npmjs.com/package/cosmiconfig) with the module name `filetemplatemanager` to load the configuration, so go check out their documentation to know where you can write it. It only looks inside the current folder.
-
-**TL;DR**: You can add a `.filetemplatemanagerrc.json` file at the root of your workspace folder. If you want JS, you can use `.filetemplatemanagerrc.js`, and export the config from that module.
-
-You can also use the following command. It initializes the configuration if it does not exist for the selected folder:
-1. Open the command palette (`ctrl+shift+p` on Windows).
-1. Select `[File template manager] Edit workspace folder configuration`.
-1. If you already had a configuration, it will open, otherwise, it will initialize it with the defaults and open it (as a JSON file).
-
-### Global configuration
-
-As for workspace folders, the configuration file can be initialized by using the `edit` command:
-1. Open the command palette (`ctrl+shift+p` on Windows).
-1. Select `[File template manager] Edit global configuration`.
-1. If you already had a configuration, it will open, otherwise, it will initialize it with the defaults and open it (as a JSON file).
-
-NB: the `templatesFolderPath` key is ignored. For the global file templates, the folder will always be `'.templates/'`.
+- **templatesFolderPath** *(string)* - The folder where the file templates and groups are stored. It is relative to the workspace folder root.
+  - Default: `'.templates/'`.
+  - For the global configuration, this is ignored. The value is hardcoded to `'.templates/'`.
+- **variables** *{ [varName: string]: any }* - A map of variables available in your file templates content. Keys must be a valid JavaScript variable name.
 
 ## Template file name
 
