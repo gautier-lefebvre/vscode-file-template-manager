@@ -159,9 +159,9 @@ class ConfigurationService {
   }
 
   private async saveCache(
-    filePath: string,
+    filePath: string | undefined,
     folderConfiguration: FolderConfiguration,
-    saveCache: (FileCache) => void,
+    saveCache: (fileCache: FileCache) => void,
   ): Promise<void> {
     if (filePath) {
       try {
