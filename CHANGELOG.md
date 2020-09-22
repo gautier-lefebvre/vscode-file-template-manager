@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.0]
 ### Changed
 - Configuration files must be in their respective folders (limit cosmiconfig search algorithm to the current folder).
 
