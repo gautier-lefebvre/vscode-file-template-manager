@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Performance boost by getting rid of glob patterns to find file templates and file template groups metadata, and by caching configurations / templates / template groups. This speeds some things up by ~1500%.
 - Commands to init/edit the global configuration, and the configuration of each folder of the current workspace.
 - Remove file templates from file template groups that use them.
+- Use webpack to bundle the extension.
 
 ## [0.3.0]
 ### Changed
