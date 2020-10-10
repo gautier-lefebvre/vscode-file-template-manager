@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.0]
+### Added
+- When creating files using a template group, open all files in the editor.
+- `groupTemplates` variable in templates.
+
 ## [0.4.0]
 ### Changed
 - Configuration files must be in their respective folders (limit cosmiconfig search algorithm to the current folder).
