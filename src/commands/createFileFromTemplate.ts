@@ -81,7 +81,12 @@ export const createFileFromTemplate = async (baseFolderUri: Uri): Promise<void> 
     if (err.code !== 'FileNotFound') { throw err; }
   }
 
-  await renderFile(fileUri, template, fileNameVariables);
+  await renderFile(
+    fileUri,
+    template,
+    fileNameVariables,
+    [template.metadata.name],
+  );
 
   await window.showTextDocument(fileUri);
 };

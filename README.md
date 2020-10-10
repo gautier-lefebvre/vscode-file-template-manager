@@ -259,11 +259,11 @@ When defining a template in `ejs`, these are the provided variables, in ascendin
 - All variables defined in the configuration of the workspace folder where the file will be created. I.e. if you use a global template in the workspace folder "aaa", you still have access to the variables set in the folder "aaa". See [File template manager configuration](#file-template-manager-configuration).
 - All variables defined in the [template file name](#template-file-name) of other files of a file template group if you are using your file template via a file template group.
 - All variables defined in the [template file name](#template-file-name) of the current file template.
+- **groupTemplates** *(string[])* - Names of the templates in the current group.
 - **timestamp** *(string)* - The current date in ISOString format.
 - **relativeFilePath** *(string)* - The path of your file relative to your workspace folder root.
 - **fileName** *(string)* - The name of your file (with extension).
 - **baseFileName** *(string)* - The name of your file, without the extensions. E.g. if your generated file name is `foo.module.scss`, baseFileName is `foo`.
-
 
 ### Example
 
@@ -303,6 +303,7 @@ Inside your file template content, you have access to:
 - **baz**: overridden and prompted to the user in `{{name}}.{{baz}}.{{id}}.whatever`.
 - **name**: overridden in your current template file name.
 - **id**: prompted to the user in `{{name}}.{{baz}}.{{id}}.whatever`.
+- **groupTemplates**: computed when creating the file using the file template.
 - **timestamp**: computed when creating the file using the file template.
 - **relativeFilePath**: computed when creating the file using the file template.
 - **fileName**: computed when creating the file using the file template.

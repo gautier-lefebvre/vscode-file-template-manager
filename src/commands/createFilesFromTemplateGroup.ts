@@ -110,11 +110,18 @@ export const createFilesFromTemplateGroup = async (baseFolderUri: Uri): Promise<
     if (actionSelected !== OVERWRITE_ACTION) { return; }
   }
 
+  // Create each file.
   await Promise.all(filesUris.map(({ template, fileUri }) => (
     renderFile(
       fileUri,
       template,
       templatesVariablesValues[template.metadata.id],
+      templatesOfGroup,
     )
+  )));
+
+  // Open the files in the editor.
+  await Promise.all(filesUris.map(async ({ fileUri }) => (
+    window.showTextDocument(fileUri, { preview: false })
   )));
 };

@@ -15,6 +15,7 @@ export const renderFile = async (
   fileUri: Uri,
   template: Template,
   fileNameVariables: { [key: string]: string },
+  groupTemplates: Template[] = [],
 ): Promise<void> => {
   const workspaceFolder = workspace.getWorkspaceFolder(fileUri);
 
@@ -37,6 +38,7 @@ export const renderFile = async (
     ...workspaceFolderConfiguration.variables,
     ...fileNameVariables,
 
+    groupTemplates: groupTemplates.map(({ metadata: { name } }) => name),
     timestamp: new Date().toISOString(),
     relativeFilePath: workspace.asRelativePath(fileUri, false),
     fileName: basename(fileUri.path),
