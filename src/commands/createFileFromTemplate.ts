@@ -85,7 +85,7 @@ export const createFileFromTemplate = async (baseFolderUri: Uri): Promise<void> 
     fileUri,
     template,
     fileNameVariables,
-    [template.metadata.name],
+    [template],
   );
 
   await window.showTextDocument(fileUri);
