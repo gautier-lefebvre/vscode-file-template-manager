@@ -22,7 +22,7 @@ Create file templates using the `[File template manager] Create a new file templ
 
 File templates are written using [ejs](https://ejs.co/) format. This gives you more flexibility to interact with variables in the template.
 
-For example, you may create a file template with the following manifest and content:
+For example, you may create a file template with the following manifest:
 
 ```json
 {
@@ -30,6 +30,8 @@ For example, you may create a file template with the following manifest and cont
   "fileTemplateName": "{{name}}.jsx"
 }
 ```
+
+And content:
 
 ```jsx
 // Created on <%= timestamp %>.
