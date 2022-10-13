@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.0]
+### Fixed
+- Fixed the order of commands in explorer context so New File is always the first.
+
+### Chore
+- Released 1.0.0 and removed alpha warning from `README.md`.
+
 ## [0.5.1]
 ### Fixed
 - Consecutive code blocks appeared as one in VSCode extension README preview.

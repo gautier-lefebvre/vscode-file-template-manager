@@ -2,7 +2,7 @@
   "name": "file-template-manager",
   "displayName": "File template manager",
   "description": "Create files from templates",
-  "version": "0.5.1",
+  "version": "1.0.0",
   "publisher": "gautier-lfbvr",
   "homepage": "https://github.com/gautier-lefebvre/vscode-file-template-manager#readme",
   "repository": {
@@ -76,12 +76,12 @@
         {
           "when": "explorerResourceIsFolder",
           "command": "file-template-manager.createFileFromTemplate",
-          "group": "navigation@4"
+          "group": "navigation@5"
         },
         {
           "when": "explorerResourceIsFolder",
           "command": "file-template-manager.createFilesFromTemplateGroup",
-          "group": "navigation@5"
+          "group": "navigation@6"
         }
       ],
       "commandPalette": [
