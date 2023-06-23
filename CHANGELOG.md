@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.0]
+### Added
+- Prompt the user for any extra variable found inside a file template content that was not resolved from the template configuration, template file name, or global variables.
+
 ## [1.0.0]
 ### Fixed
 - Fixed the order of commands in explorer context so New File is always the first.
