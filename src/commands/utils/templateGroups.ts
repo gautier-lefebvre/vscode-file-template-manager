@@ -4,11 +4,12 @@ import {
   Uri,
   window,
 } from 'vscode';
+
 import { COMMANDS } from '../../constants';
 
 import { FolderType } from '../../domain/config/types';
 import { Template } from '../../domain/templates/data/template';
-import { getAllDistinctVarNames, TemplateGroupVariableValues } from '../../domain/templates/data/template/utils';
+import { getAllDistinctVarNames, getVariablesInsideTemplate, TemplateGroupVariableValues } from '../../domain/templates/data/template/utils';
 import { TemplateGroup } from '../../domain/templates/data/templateGoup';
 import { templatesService } from '../../domain/templates/services';
 import { BooleanQuickPickItem } from './common';
@@ -174,8 +175,9 @@ export async function askUserToCreateTemplateGroup(
 export async function promptUserForTemplatesVariablesValues(
   templatesUseSameVariables: boolean,
   templates: Template[],
+  baseFolderUri: Uri,
 ): Promise<TemplateGroupVariableValues | undefined> {
-  const variablesInTemplates = (
+  const variablesInTemplateNames = (
     templates.reduce(
       (acc: { [templateId: string]: string[] }, template) => {
         acc[template.metadata.id] = getAllDistinctVarNames(template.metadata.fileTemplateName);
@@ -195,9 +197,10 @@ export async function promptUserForTemplatesVariablesValues(
     )
   );
 
+  /* Get all variables inside template file names. */
   for (let i = 0; i < templates.length; ++i) {
     const template = templates[i];
-    const varNames = variablesInTemplates[template.metadata.id];
+    const varNames = variablesInTemplateNames[template.metadata.id];
 
     for (let j = 0; j < varNames.length; ++j) {
       const varName = varNames[j];
@@ -208,7 +211,7 @@ export async function promptUserForTemplatesVariablesValues(
 
       const templatesVariableUsage = templates.map((t) => ({
         template: t,
-        usesVariable: variablesInTemplates[t.metadata.id].includes(varName),
+        usesVariable: variablesInTemplateNames[t.metadata.id].includes(varName),
       }));
 
       const fileTemplateNames = !templatesUseSameVariables
@@ -225,10 +228,18 @@ export async function promptUserForTemplatesVariablesValues(
       if (variableValue === undefined) { return undefined; }
 
       if (templatesUseSameVariables) {
+        /* Add variable to all templates. */
         templates.forEach(({ metadata: { id } }) => {
           variablesValues[id][varName] = variableValue;
         });
       } else {
+        /*
+         * Add variable to current template,
+         * and any template who do not use the variable in their name.
+         *
+         * NB: this is done for retrocompatibility. A more logical way would be to ignore other
+         * templates, and prompt them independently based on their content.
+         */
         variablesValues[template.metadata.id][varName] = variableValue;
 
         templatesVariableUsage
@@ -236,6 +247,62 @@ export async function promptUserForTemplatesVariablesValues(
           .forEach(({ template: { metadata: { id } } }) => {
             variablesValues[id][varName] = variableValue;
           });
+      }
+    }
+  }
+
+  const variablesInsideTemplates = (
+    await Promise.all(templates.map(async (template) => ({
+      template,
+      variables: await getVariablesInsideTemplate(
+        baseFolderUri,
+        template,
+        variablesValues[template.metadata.id],
+        templates,
+      ),
+    })))
+  ).reduce(
+    (acc: { [key:string]: string[] }, { template, variables }) => {
+      acc[template.metadata.id] = variables;
+      return acc;
+    },
+    {},
+  );
+
+  /* Prompt any variable in templates that is not already defined. */
+  /* If templates uses the same variables, prompt once per variable. */
+  /* Otherwise prompt for each file independently. */
+  for (let i = 0; i < templates.length; ++i) {
+    const template = templates[i];
+    const varNames = variablesInsideTemplates[template.metadata.id];
+
+    for (let j = 0; j < varNames.length; ++j) {
+      const varName = varNames[j];
+
+      const value = variablesValues[template.metadata.id][varName];
+
+      if (value !== undefined) { continue; }
+
+      const templatesUsingVariable = !templatesUseSameVariables
+        ? [template]
+        : templates
+          .filter(({ metadata: { id } }) => variablesInsideTemplates[id].includes(varName));
+
+      const variableValue = await window.showInputBox({
+        placeHolder: `What is the value of '${varName}'?`,
+        prompt: `'${varName}' inside content of ${templatesUsingVariable.length > 1 ? 'templates' : 'template'} ${templatesUsingVariable.map((t) => `'${t.metadata.name}'`).join(', ')}?`,
+      });
+
+      if (variableValue === undefined) { return undefined; }
+
+      if (templatesUseSameVariables) {
+        /* Add variable to all templates. */
+        templates.forEach(({ metadata: { id } }) => {
+          variablesValues[id][varName] = variableValue;
+        });
+      } else {
+        /* Add variable to current template only. */
+        variablesValues[template.metadata.id][varName] = variableValue;
       }
     }
   }

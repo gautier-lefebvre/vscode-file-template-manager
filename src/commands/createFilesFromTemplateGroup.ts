@@ -1,5 +1,9 @@
 import {
-  commands, Uri, window, workspace,
+  commands,
+  FileSystemError,
+  Uri,
+  window,
+  workspace,
 } from 'vscode';
 import { COMMANDS } from '../constants';
 import { FolderType } from '../domain/config/types';
@@ -60,12 +64,13 @@ export const createFilesFromTemplateGroup = async (baseFolderUri: Uri): Promise<
     ))),
   );
 
-  const templatesVariablesValues = await promptUserForTemplatesVariablesValues(
+  const variablesPerTemplates = await promptUserForTemplatesVariablesValues(
     templateGroup.metadata.templatesUseSameVariables,
     templatesOfGroup,
+    baseFolderUri,
   );
 
-  if (!templatesVariablesValues) { return; }
+  if (!variablesPerTemplates) { return; }
 
   const filesUris = await Promise.all(templatesOfGroup.map(
     async (template): Promise<{ template: Template, fileUri: Uri, exists: boolean }> => {
@@ -73,7 +78,7 @@ export const createFilesFromTemplateGroup = async (baseFolderUri: Uri): Promise<
 
       const fileUri = Uri.joinPath(
         baseFolderUri,
-        generateFileName(fileTemplateName, templatesVariablesValues[id]),
+        generateFileName(fileTemplateName, variablesPerTemplates[id]),
       );
 
       let exists = false;
@@ -82,7 +87,7 @@ export const createFilesFromTemplateGroup = async (baseFolderUri: Uri): Promise<
         await workspace.fs.stat(fileUri);
         exists = true;
       } catch (err) {
-        if (err.code === 'FileNotFound') {
+        if (err instanceof FileSystemError && err.code === 'FileNotFound') {
           exists = false;
         } else {
           throw err;
@@ -115,7 +120,7 @@ export const createFilesFromTemplateGroup = async (baseFolderUri: Uri): Promise<
     renderFile(
       fileUri,
       template,
-      templatesVariablesValues[template.metadata.id],
+      variablesPerTemplates[template.metadata.id],
       templatesOfGroup,
     )
   )));

@@ -7,16 +7,18 @@ import ejs from 'ejs';
 import { config } from '../config';
 import { Template } from '../templates/data/template';
 
-/**
- * Render a file.
- * Make sure that the file does not exist or can be overwritten before calling this method.
- */
-export const renderFile = async (
+export const compileTemplate = (templateContent: string): ejs.AsyncTemplateFunction => ejs.compile(
+  templateContent,
+  { async: true },
+);
+
+export const renderFileContent = async (
   fileUri: Uri,
-  template: Template,
-  fileNameVariables: { [key: string]: string },
-  groupTemplates: Template[] = [],
-): Promise<void> => {
+  templateFunction: ejs.AsyncTemplateFunction,
+  /* Variables inside template title and content. */
+  templateVariables: ejs.Data,
+  groupTemplates: Template[],
+): Promise<string> => {
   const workspaceFolder = workspace.getWorkspaceFolder(fileUri);
 
   if (!workspaceFolder) {
@@ -26,17 +28,15 @@ export const renderFile = async (
   const [
     globalConfiguration,
     workspaceFolderConfiguration,
-    templateContent,
   ] = await Promise.all([
     config.getGlobalFolderConfiguration(),
     config.getWorkspaceFolderConfiguration(workspaceFolder.uri),
-    workspace.fs.readFile(template.contentFileUri),
   ]);
 
   const variables = {
     ...globalConfiguration.variables,
     ...workspaceFolderConfiguration.variables,
-    ...fileNameVariables,
+    ...templateVariables,
 
     groupTemplates: groupTemplates.map(({ metadata: { name } }) => name),
     timestamp: new Date().toISOString(),
@@ -45,10 +45,26 @@ export const renderFile = async (
     baseFileName: basename(fileUri.path).split('.')[0],
   };
 
-  const generatedFileContent = await ejs.render(
-    new TextDecoder('utf-8').decode(templateContent),
-    variables,
-    { async: true },
+  return templateFunction(variables);
+};
+
+/**
+ * Render a file.
+ * Make sure that the file does not exist or can be overwritten before calling this method.
+ */
+export const renderFile = async (
+  fileUri: Uri,
+  template: Template,
+  templateVariables: ejs.Data,
+  groupTemplates: Template[] = [],
+): Promise<void> => {
+  const templateContent = await workspace.fs.readFile(template.contentFileUri);
+
+  const generatedFileContent = await renderFileContent(
+    fileUri,
+    compileTemplate(new TextDecoder('utf-8').decode(templateContent)),
+    templateVariables,
+    groupTemplates,
   );
 
   await workspace.fs.writeFile(

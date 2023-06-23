@@ -3,6 +3,7 @@ import { TextDecoder, TextEncoder } from 'util';
 
 import slugify from 'slugify';
 import {
+  FileSystemError,
   FileType,
   Uri,
   window,
@@ -98,8 +99,8 @@ export abstract class FolderTemplatesService implements IFolderTemplatesService 
     } catch (err) {
       delete this.templatesCache[id];
 
-      if (err.code !== 'FileNotFound') {
-        logger.appendLine(err);
+      if (!(err instanceof FileSystemError && err.code === 'FileNotFound')) {
+        logger.appendLine((err as Error).toString());
 
         // Show warning and abort.
         window.showWarningMessage(`Could not load metadata in template folder ${templateFolderUri.path}. Template is omitted.`);
@@ -149,8 +150,8 @@ export abstract class FolderTemplatesService implements IFolderTemplatesService 
     } catch (err) {
       delete this.templateGroupsCache[id];
 
-      if (err !== 'FileNotFound') {
-        logger.appendLine(err);
+      if (!(err instanceof FileSystemError && err.code === 'FileNotFound')) {
+        logger.appendLine((err as Error).toString());
 
         // Show warning and abort.
         window.showWarningMessage(`Could not load template group metadata file at ${metadataFileUri.path}. Template group is omitted.`);
@@ -174,7 +175,7 @@ export abstract class FolderTemplatesService implements IFolderTemplatesService 
     this.folderUri = folderUri;
   }
 
-  public abstract async getFolderConfiguration(): Promise<FolderConfiguration>;
+  public abstract getFolderConfiguration(): Promise<FolderConfiguration>;
 
   public async getTemplates(): Promise<ReadonlyArray<Template>> {
     const folderConfiguration = await this.getFolderConfiguration();
@@ -203,7 +204,7 @@ export abstract class FolderTemplatesService implements IFolderTemplatesService 
 
       return compact(templates);
     } catch (err) {
-      if (err.code !== 'FileNotFound') { throw err; }
+      if (!(err instanceof FileSystemError && err.code === 'FileNotFound')) { throw err; }
 
       return [];
     }
@@ -248,7 +249,7 @@ export abstract class FolderTemplatesService implements IFolderTemplatesService 
 
       return compact(templateGroups);
     } catch (err) {
-      if (err.code !== 'FileNotFound') { throw err; }
+      if (!(err instanceof FileSystemError && err.code === 'FileNotFound')) { throw err; }
 
       return [];
     }
@@ -406,12 +407,11 @@ export abstract class FolderTemplatesService implements IFolderTemplatesService 
       try {
         await workspace.fs.stat(await getUri(id, configuration));
       } catch (err) {
-        switch (err.code) {
-          case 'FileNotFound':
-            return id;
-          default:
-            throw err;
+        if (err instanceof FileSystemError && err.code === 'FileNotFound') {
+          return id;
         }
+
+        throw err;
       }
     } while (count < 100);
 

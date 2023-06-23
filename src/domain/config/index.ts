@@ -3,6 +3,7 @@ import { TextEncoder } from 'util';
 import { cosmiconfig } from 'cosmiconfig';
 import {
   Disposable,
+  FileSystemError,
   Uri,
   window,
   workspace,
@@ -74,7 +75,7 @@ class ConfigurationService {
         filePath,
       } = await this.readConfiguration<RawWorkspaceFolderConfiguration>(workspaceFolderUri));
     } catch (err) {
-      logger.appendLine(err);
+      logger.appendLine((err as Error).toString());
       window.showWarningMessage(`Could not load configuration for folder '${workspaceFolderUri.path}'. Default configuration will be used instead.`);
 
       config = {} as RawWorkspaceFolderConfiguration;
@@ -118,7 +119,7 @@ class ConfigurationService {
         filePath,
       } = await this.readConfiguration<RawFolderConfiguration>(globalStorageUri));
     } catch (err) {
-      logger.appendLine(err);
+      logger.appendLine((err as Error).toString());
       window.showWarningMessage('Could not load global templates configuration. Default configuration will be used instead.');
 
       config = {} as RawFolderConfiguration;
@@ -185,7 +186,7 @@ class ConfigurationService {
         clearCache();
       } catch (err) {
         clearCache();
-        if (err.code !== 'FileNotFound') { throw err; }
+        if (!(err instanceof FileSystemError && err.code === 'FileNotFound')) { throw err; }
       }
     }
 
@@ -207,7 +208,7 @@ class ConfigurationService {
           folderConfiguration,
         });
       } catch (err) {
-        logger.appendLine(err);
+        logger.appendLine((err as Error).toString());
       }
     }
   }

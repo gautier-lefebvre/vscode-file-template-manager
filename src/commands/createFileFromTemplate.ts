@@ -1,5 +1,6 @@
 import {
   commands,
+  FileSystemError,
   Uri,
   window,
   workspace,
@@ -51,18 +52,19 @@ export const createFileFromTemplate = async (baseFolderUri: Uri): Promise<void> 
 
   if (!template) { return; }
 
-  const fileNameVariablesPerTemplates = await promptUserForTemplatesVariablesValues(
+  const variablesPerTemplates = await promptUserForTemplatesVariablesValues(
     true,
     [template],
+    baseFolderUri,
   );
 
-  if (!fileNameVariablesPerTemplates) { return; }
+  if (!variablesPerTemplates) { return; }
 
-  const fileNameVariables = fileNameVariablesPerTemplates[template.metadata.id];
+  const templateVariables = variablesPerTemplates[template.metadata.id];
 
   const fileUri = Uri.joinPath(
     baseFolderUri,
-    generateFileName(template.metadata.fileTemplateName, fileNameVariables),
+    generateFileName(template.metadata.fileTemplateName, templateVariables),
   );
 
   try {
@@ -78,13 +80,13 @@ export const createFileFromTemplate = async (baseFolderUri: Uri): Promise<void> 
     if (actionSelected !== OVERWRITE_ACTION) { return; }
   } catch (err) {
     // Ignore FileNotFound.
-    if (err.code !== 'FileNotFound') { throw err; }
+    if (!(err instanceof FileSystemError && err.code === 'FileNotFound')) { throw err; }
   }
 
   await renderFile(
     fileUri,
     template,
-    fileNameVariables,
+    templateVariables,
     [template],
   );
 
