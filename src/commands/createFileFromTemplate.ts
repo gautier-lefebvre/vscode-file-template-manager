@@ -7,9 +7,10 @@ import {
 } from 'vscode';
 
 import { COMMANDS } from '../constants';
-import { renderFile } from '../domain/renderer';
+import { TemplateRenderer } from '../domain/renderer/templateRenderer';
 import { Template } from '../domain/templates/data/template';
 import { generateFileName } from '../domain/templates/data/template/utils';
+
 import { promptUserForTemplatesVariablesValues } from './utils/templateGroups';
 import { getTemplatesOfWorkspaceFolderQuickPickItems, getGlobalTemplatesQuickPickItems } from './utils/templates';
 
@@ -52,19 +53,21 @@ export const createFileFromTemplate = async (baseFolderUri: Uri): Promise<void> 
 
   if (!template) { return; }
 
+  const templateRenderer = new TemplateRenderer(template);
+
   const variablesPerTemplates = await promptUserForTemplatesVariablesValues(
     true,
-    [template],
+    [templateRenderer],
     baseFolderUri,
   );
 
   if (!variablesPerTemplates) { return; }
 
-  const templateVariables = variablesPerTemplates[template.metadata.id];
+  const templateVariables = variablesPerTemplates[templateRenderer.template.metadata.id];
 
   const fileUri = Uri.joinPath(
     baseFolderUri,
-    generateFileName(template.metadata.fileTemplateName, templateVariables),
+    generateFileName(templateRenderer.template.metadata.fileTemplateName, templateVariables),
   );
 
   try {
@@ -83,11 +86,10 @@ export const createFileFromTemplate = async (baseFolderUri: Uri): Promise<void> 
     if (!(err instanceof FileSystemError && err.code === 'FileNotFound')) { throw err; }
   }
 
-  await renderFile(
+  await templateRenderer.renderToFile(
     fileUri,
-    template,
     templateVariables,
-    [template],
+    [templateRenderer.template],
   );
 
   await window.showTextDocument(fileUri);

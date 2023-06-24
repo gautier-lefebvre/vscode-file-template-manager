@@ -1,10 +1,12 @@
-import { Uri, workspace } from 'vscode';
 import escapeStringRegexp from 'escape-string-regexp';
+import { Uri } from 'vscode';
 
-import { TextDecoder } from 'util';
 import { validVariableName } from '../../../../constants';
+import { logger } from '../../../../services/logger';
+import { MissingVariableError } from '../../../renderer/missingVariableError';
+import { TemplateRenderer } from '../../../renderer/templateRenderer';
+
 import { Template } from './index';
-import { compileTemplate, renderFileContent } from '../../../renderer';
 
 export type TemplateVariableValues = {
   [varName: string]: string,
@@ -83,42 +85,31 @@ export const generateFileUri = (
  * This might be slow because we need to try/catch around ejs.render to get missing variables.
  *
  * @param baseFolderUri - Base folder URI of the command.
- * @param template - Template.
+ * @param templateRenderer - Template renderer.
  * @param templateFileNameVariables - Name of variables inside the template file name.
  * @param groupTemplates - Templates inside the group.
  * @returns Name of variables inside the template content.
  */
 export const getVariablesInsideTemplate = async (
   baseFolderUri: Uri,
-  template: Template,
+  templateRenderer: TemplateRenderer,
   templateFileNameVariables: { [key: string]: string },
   groupTemplates: Template[],
 ): Promise<string[]> => {
   const fileUri = generateFileUri(
     baseFolderUri,
-    template.metadata.fileTemplateName,
+    templateRenderer.template.metadata.fileTemplateName,
     templateFileNameVariables,
-  );
-
-  const workspaceFolder = workspace.getWorkspaceFolder(fileUri);
-
-  if (!workspaceFolder) {
-    throw Error('Cannot create files outside of a workspace folder.');
-  }
-
-  const templateFunction = compileTemplate(
-    new TextDecoder('utf-8')
-      .decode(await workspace.fs.readFile(template.contentFileUri)),
   );
 
   const fakeVariablesInTemplateContent: { [key: string]: string} = {};
 
-  let missingVariableName: string | undefined;
+  let hasMissingVariable = false;
+
   do {
     try {
-      await renderFileContent(
+      await templateRenderer.renderTemplate(
         fileUri,
-        templateFunction,
         {
           ...templateFileNameVariables,
           ...fakeVariablesInTemplateContent,
@@ -126,22 +117,17 @@ export const getVariablesInsideTemplate = async (
         groupTemplates,
       );
 
-      missingVariableName = undefined;
+      hasMissingVariable = false;
     } catch (err) {
-      if (err instanceof ReferenceError) {
-        const matchResult = err.message.match(/(\w+) is not defined/);
-
-        if (matchResult && matchResult[1]) {
-          [, missingVariableName] = matchResult;
-          fakeVariablesInTemplateContent[missingVariableName] = 'placeholderValue';
-
-          continue;
-        }
+      if (err instanceof MissingVariableError) {
+        hasMissingVariable = true;
+        fakeVariablesInTemplateContent[err.missingVariableName] = 'placeholderValue';
+        logger.append(err.missingVariableName);
+      } else {
+        throw err;
       }
-
-      throw err;
     }
-  } while (missingVariableName);
+  } while (hasMissingVariable);
 
   return Object.keys(fakeVariablesInTemplateContent);
 };
