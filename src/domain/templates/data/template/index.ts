@@ -2,6 +2,7 @@ import { Uri } from 'vscode';
 
 import { TEMPLATE_CONTENT_FILENAME, TEMPLATE_METADATA_FILENAME } from '../../../../constants';
 import { FolderConfiguration } from '../../../config/types';
+
 import { TemplateMetadata } from './metadata';
 
 export { TemplateMetadata };

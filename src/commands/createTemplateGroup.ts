@@ -3,6 +3,7 @@ import { window } from 'vscode';
 import { FolderType } from '../domain/config/types';
 import { TemplateGroup } from '../domain/templates/data/templateGoup';
 import { templatesService } from '../domain/templates/services';
+
 import { FolderQuickPickItem, getCreateTemplateGroupFoldersQuickPickItems, WorkspaceFolderQuickPickItem } from './utils/folders';
 import { askUserToCreateTemplate, showTemplateGroupNameInputBox, showTemplatesUseSameVariablesQuickPick } from './utils/templateGroups';
 import { getTemplateQuickPickItemsOfSelectedFolder, mapTemplateToQuickPickItem } from './utils/templates';

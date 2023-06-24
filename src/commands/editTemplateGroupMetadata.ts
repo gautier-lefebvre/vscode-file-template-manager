@@ -2,8 +2,8 @@ import { window } from 'vscode';
 
 import { FolderType } from '../domain/config/types';
 import { templatesService } from '../domain/templates/services';
+
 import { getTemplateGroupFoldersQuickPickItems, WorkspaceFolderQuickPickItem } from './utils/folders';
-import { getTemplateQuickPickItemsOfSelectedFolder, mapTemplateToQuickPickItem } from './utils/templates';
 import {
   askUserToCreateTemplate,
   askUserToCreateTemplateGroup,
@@ -11,6 +11,7 @@ import {
   showTemplateGroupNameInputBox,
   showTemplatesUseSameVariablesQuickPick,
 } from './utils/templateGroups';
+import { getTemplateQuickPickItemsOfSelectedFolder, mapTemplateToQuickPickItem } from './utils/templates';
 
 export const editTemplateGroupMetadata = async (): Promise<void> => {
   const foldersQuickPickItems = getTemplateGroupFoldersQuickPickItems();

@@ -38,7 +38,28 @@
     "class-methods-use-this": "off",
     "no-await-in-loop": "off",
     "no-continue": "off",
-    "no-plusplus": "off"
+    "no-plusplus": "off",
+    "prefer-destructuring": "off",
+
+    "import/order": [
+      "warn",
+      {
+        "groups": [
+          "builtin",
+          "external",
+          "internal",
+          "parent",
+          "sibling",
+          "index",
+          "object"
+        ],
+        "alphabetize": {
+          "order": "asc",
+          "caseInsensitive": true
+        },
+        "newlines-between": "always"
+      }
+    ]
   },
 
   "overrides": [

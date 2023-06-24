@@ -9,9 +9,10 @@ import {
   workspace,
 } from 'vscode';
 
-import { logger } from '../../services/logger';
-import { getExtensionContext } from '../../services/extensionContext';
 import { CONFIG_FILE_MODULE_NAME, DEFAULT_TEMPLATES_FOLDER } from '../../constants';
+import { getExtensionContext } from '../../services/extensionContext';
+import { logger } from '../../services/logger';
+
 import {
   FolderConfiguration,
   FolderType,
