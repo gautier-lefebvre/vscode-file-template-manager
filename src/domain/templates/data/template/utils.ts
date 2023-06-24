@@ -2,7 +2,6 @@ import escapeStringRegexp from 'escape-string-regexp';
 import { Uri } from 'vscode';
 
 import { validVariableName } from '../../../../constants';
-import { logger } from '../../../../services/logger';
 import { MissingVariableError } from '../../../renderer/missingVariableError';
 import { TemplateRenderer } from '../../../renderer/templateRenderer';
 
@@ -122,7 +121,6 @@ export const getVariablesInsideTemplate = async (
       if (err instanceof MissingVariableError) {
         hasMissingVariable = true;
         fakeVariablesInTemplateContent[err.missingVariableName] = 'placeholderValue';
-        logger.append(err.missingVariableName);
       } else {
         throw err;
       }
