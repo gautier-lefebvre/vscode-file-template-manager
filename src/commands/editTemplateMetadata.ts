@@ -1,8 +1,9 @@
 import { commands, window } from 'vscode';
-import { COMMANDS } from '../constants';
 
+import { COMMANDS } from '../constants';
 import { FolderType } from '../domain/config/types';
 import { templatesService } from '../domain/templates/services';
+
 import { getTemplateFoldersQuickPickItems, WorkspaceFolderQuickPickItem } from './utils/folders';
 import {
   getTemplateQuickPickItemsOfSelectedFolder,

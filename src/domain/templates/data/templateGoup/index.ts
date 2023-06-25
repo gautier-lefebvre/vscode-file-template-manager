@@ -1,6 +1,7 @@
 import { Uri } from 'vscode';
 
 import { FolderConfiguration } from '../../../config/types';
+
 import { TemplateGroupMetadata } from './metadata';
 
 export { TemplateGroupMetadata };

@@ -240,7 +240,7 @@ Moreover, the variables `foo` and `bar` will be available to you in your file te
 
 ### Inside file template groups
 
-Your file template groups have an additional setting so you can configure whether or not all file templates or the group share the same variable values.
+Your file template groups have an additional setting so you can configure whether or not all file templates of the group share the same variable values.
 
 If yes, and you have file templates with file names `{{foo}}.{{bar}}.jsx` and `{{foo}}.md`, you will be prompted once for `foo` and once for `bar`.
 
@@ -260,6 +260,14 @@ When defining a template in `ejs`, these are the provided variables, in ascendin
 - **relativeFilePath** *(string)* - The path of your file relative to your workspace folder root.
 - **fileName** *(string)* - The name of your file (with extension).
 - **baseFileName** *(string)* - The name of your file, without the extensions. E.g. if your generated file name is `foo.module.scss`, baseFileName is `foo`.
+
+### Extra variables
+
+Any extra variable found inside a file template will be prompted:
+* independently for each template if the template is used as a standalone, or within a group not sharing its variables.
+* once per different variable if the template is used within a group sharing its variables.
+
+Note: to find extra variables inside a `ejs` template, I have to try to render the file for each extra variable, so this might affect performance if there are a lot of them.
 
 ### Example
 
@@ -293,17 +301,31 @@ Other file templates in your file template group with file names:
 The current file template with file name:
 - `{{name}}.jsx`
 
+And file template content:
+```jsx
+import { memo } from 'react';
+
+export const <%= baseFileName %> = memo(function <%= baseFileName %>() {
+  return (
+    <div>
+      <%= someExtraVariable %>
+    </div>
+  );
+});
+```
+
 Inside your file template content, you have access to:
 - **foo**: `'yolo'` (overridden in the local configuration).
-- **bar**: `'bbb` (global configuration).
-- **baz**: overridden and prompted to the user in `{{name}}.{{baz}}.{{id}}.whatever`.
-- **name**: overridden in your current template file name.
-- **id**: prompted to the user in `{{name}}.{{baz}}.{{id}}.whatever`.
+- **bar**: `'bbb'` (global configuration).
+- **baz**: overridden and prompted to you from `{{name}}.{{baz}}.{{id}}.whatever`.
+- **name**: prompted to you from your current template file name.
+- **id**: prompted to you from `{{name}}.{{baz}}.{{id}}.whatever`.
 - **groupTemplates**: computed when creating the file using the file template.
 - **timestamp**: computed when creating the file using the file template.
 - **relativeFilePath**: computed when creating the file using the file template.
 - **fileName**: computed when creating the file using the file template.
 - **baseFileName**: computed when creating the file using the file template.
+- **someExtraVariable**: prompted to you when creating the file because it was not resolved from the variables above.
 
 ## Release Notes
 

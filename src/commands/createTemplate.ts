@@ -1,8 +1,9 @@
 import { window } from 'vscode';
 
-import { Template } from '../domain/templates/data/template';
 import { FolderType } from '../domain/config/types';
+import { Template } from '../domain/templates/data/template';
 import { templatesService } from '../domain/templates/services';
+
 import { FolderQuickPickItem, getCreateTemplateFoldersQuickPickItems, WorkspaceFolderQuickPickItem } from './utils/folders';
 import { showFileTemplateNameInputBox, showOnlyAsPartOfGroupQuickPick, showTemplateNameInputBox } from './utils/templates';
 

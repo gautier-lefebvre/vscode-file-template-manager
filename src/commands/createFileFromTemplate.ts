@@ -1,14 +1,16 @@
 import {
   commands,
+  FileSystemError,
   Uri,
   window,
   workspace,
 } from 'vscode';
 
 import { COMMANDS } from '../constants';
-import { renderFile } from '../domain/renderer';
+import { TemplateRenderer } from '../domain/renderer/templateRenderer';
 import { Template } from '../domain/templates/data/template';
 import { generateFileName } from '../domain/templates/data/template/utils';
+
 import { promptUserForTemplatesVariablesValues } from './utils/templateGroups';
 import { getTemplatesOfWorkspaceFolderQuickPickItems, getGlobalTemplatesQuickPickItems } from './utils/templates';
 
@@ -51,18 +53,21 @@ export const createFileFromTemplate = async (baseFolderUri: Uri): Promise<void> 
 
   if (!template) { return; }
 
-  const fileNameVariablesPerTemplates = await promptUserForTemplatesVariablesValues(
+  const templateRenderer = new TemplateRenderer(template);
+
+  const variablesPerTemplates = await promptUserForTemplatesVariablesValues(
     true,
-    [template],
+    [templateRenderer],
+    baseFolderUri,
   );
 
-  if (!fileNameVariablesPerTemplates) { return; }
+  if (!variablesPerTemplates) { return; }
 
-  const fileNameVariables = fileNameVariablesPerTemplates[template.metadata.id];
+  const templateVariables = variablesPerTemplates[templateRenderer.template.metadata.id];
 
   const fileUri = Uri.joinPath(
     baseFolderUri,
-    generateFileName(template.metadata.fileTemplateName, fileNameVariables),
+    generateFileName(templateRenderer.template.metadata.fileTemplateName, templateVariables),
   );
 
   try {
@@ -78,14 +83,13 @@ export const createFileFromTemplate = async (baseFolderUri: Uri): Promise<void> 
     if (actionSelected !== OVERWRITE_ACTION) { return; }
   } catch (err) {
     // Ignore FileNotFound.
-    if (err.code !== 'FileNotFound') { throw err; }
+    if (!(err instanceof FileSystemError && err.code === 'FileNotFound')) { throw err; }
   }
 
-  await renderFile(
+  await templateRenderer.renderToFile(
     fileUri,
-    template,
-    fileNameVariables,
-    [template],
+    templateVariables,
+    [templateRenderer.template],
   );
 
   await window.showTextDocument(fileUri);

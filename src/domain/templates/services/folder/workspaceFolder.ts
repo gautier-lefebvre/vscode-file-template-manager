@@ -1,5 +1,6 @@
 import { config } from '../../../config';
 import { FolderConfiguration } from '../../../config/types';
+
 import { FolderTemplatesService } from './base';
 
 export class WorkspaceFolderTemplatesService extends FolderTemplatesService {

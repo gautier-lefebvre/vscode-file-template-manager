@@ -2,12 +2,13 @@ import { isDeepStrictEqual } from 'util';
 
 import { Uri } from 'vscode';
 
+import { FolderConfiguration } from '../../config/types';
 import { Template, TemplateMetadata } from '../data/template';
-import { TemplateGroupToCreate, TemplateToCreate } from './folder/base';
 import { TemplateGroup, TemplateGroupMetadata } from '../data/templateGoup';
+
+import { TemplateGroupToCreate, TemplateToCreate } from './folder/base';
 import { GlobalFolderTemplatesService } from './folder/global';
 import { WorkspaceFolderTemplatesService } from './folder/workspaceFolder';
-import { FolderConfiguration } from '../../config/types';
 
 class TemplatesService {
   private workspaceFolderTemplatesServicesCache

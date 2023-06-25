@@ -2,6 +2,7 @@ import { window } from 'vscode';
 
 import { FolderType } from '../domain/config/types';
 import { templatesService } from '../domain/templates/services';
+
 import { getTemplateGroupFoldersQuickPickItems, WorkspaceFolderQuickPickItem } from './utils/folders';
 import { getTemplateGroupQuickPickItemsOfSelectedFolder } from './utils/templateGroups';
 

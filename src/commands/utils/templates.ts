@@ -4,6 +4,7 @@ import { FolderType } from '../../domain/config/types';
 import { Template } from '../../domain/templates/data/template';
 import { findInvalidVarNamePattern } from '../../domain/templates/data/template/utils';
 import { templatesService } from '../../domain/templates/services';
+
 import { BooleanQuickPickItem } from './common';
 import { FolderQuickPickItem, WorkspaceFolderQuickPickItem } from './folders';
 

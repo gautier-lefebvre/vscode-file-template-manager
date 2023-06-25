@@ -1,20 +1,19 @@
 import { commands, ExtensionContext } from 'vscode';
 
-import { config } from './domain/config';
-import { setExtensionContext } from './services/extensionContext';
-
-import { COMMANDS } from './constants';
-import { createTemplate } from './commands/createTemplate';
-import { editTemplate } from './commands/editTemplate';
-import { editTemplateMetadata } from './commands/editTemplateMetadata';
-import { removeTemplate } from './commands/removeTemplate';
-import { createTemplateGroup } from './commands/createTemplateGroup';
-import { editTemplateGroupMetadata } from './commands/editTemplateGroupMetadata';
-import { removeTemplateGroup } from './commands/removeTemplateGroup';
 import { createFileFromTemplate } from './commands/createFileFromTemplate';
 import { createFilesFromTemplateGroup } from './commands/createFilesFromTemplateGroup';
+import { createTemplate } from './commands/createTemplate';
+import { createTemplateGroup } from './commands/createTemplateGroup';
 import { editGlobalConfiguration } from './commands/editGlobalConfiguration';
+import { editTemplate } from './commands/editTemplate';
+import { editTemplateGroupMetadata } from './commands/editTemplateGroupMetadata';
+import { editTemplateMetadata } from './commands/editTemplateMetadata';
 import { editWorkspaceFolderConfiguration } from './commands/editWorkspaceFolderConfiguration';
+import { removeTemplate } from './commands/removeTemplate';
+import { removeTemplateGroup } from './commands/removeTemplateGroup';
+import { COMMANDS } from './constants';
+import { config } from './domain/config';
+import { setExtensionContext } from './services/extensionContext';
 
 export async function activate(context: ExtensionContext): Promise<void> {
   setExtensionContext(context);

@@ -1,6 +1,11 @@
 import escapeStringRegexp from 'escape-string-regexp';
+import { Uri } from 'vscode';
 
 import { validVariableName } from '../../../../constants';
+import { MissingVariableError } from '../../../renderer/missingVariableError';
+import { TemplateRenderer } from '../../../renderer/templateRenderer';
+
+import { Template } from './index';
 
 export type TemplateVariableValues = {
   [varName: string]: string,
@@ -64,3 +69,63 @@ export const generateFileName = (
       fileTemplateName,
     )
 );
+
+export const generateFileUri = (
+  baseFolderUri: Uri,
+  fileTemplateName: Template['metadata']['fileTemplateName'],
+  fileNameVariables: { [key: string]: string },
+): Uri => Uri.joinPath(
+  baseFolderUri,
+  generateFileName(fileTemplateName, fileNameVariables),
+);
+
+/**
+ * Return name of variables inside the template content.
+ * This might be slow because we need to try/catch around ejs.render to get missing variables.
+ *
+ * @param baseFolderUri - Base folder URI of the command.
+ * @param templateRenderer - Template renderer.
+ * @param templateFileNameVariables - Name of variables inside the template file name.
+ * @param groupTemplates - Templates inside the group.
+ * @returns Name of variables inside the template content.
+ */
+export const getVariablesInsideTemplate = async (
+  baseFolderUri: Uri,
+  templateRenderer: TemplateRenderer,
+  templateFileNameVariables: { [key: string]: string },
+  groupTemplates: Template[],
+): Promise<string[]> => {
+  const fileUri = generateFileUri(
+    baseFolderUri,
+    templateRenderer.template.metadata.fileTemplateName,
+    templateFileNameVariables,
+  );
+
+  const fakeVariablesInTemplateContent: { [key: string]: string} = {};
+
+  let hasMissingVariable = false;
+
+  do {
+    try {
+      await templateRenderer.renderTemplate(
+        fileUri,
+        {
+          ...templateFileNameVariables,
+          ...fakeVariablesInTemplateContent,
+        },
+        groupTemplates,
+      );
+
+      hasMissingVariable = false;
+    } catch (err) {
+      if (err instanceof MissingVariableError) {
+        hasMissingVariable = true;
+        fakeVariablesInTemplateContent[err.missingVariableName] = 'placeholderValue';
+      } else {
+        throw err;
+      }
+    }
+  } while (hasMissingVariable);
+
+  return Object.keys(fakeVariablesInTemplateContent);
+};

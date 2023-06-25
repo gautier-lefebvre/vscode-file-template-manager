@@ -1,14 +1,19 @@
 import {
-  commands, Uri, window, workspace,
+  commands,
+  FileSystemError,
+  Uri,
+  window,
+  workspace,
 } from 'vscode';
+
 import { COMMANDS } from '../constants';
 import { FolderType } from '../domain/config/types';
-import { renderFile } from '../domain/renderer';
-import { Template } from '../domain/templates/data/template';
+import { TemplateRenderer } from '../domain/renderer/templateRenderer';
 import { generateFileName } from '../domain/templates/data/template/utils';
 import { TemplateGroup } from '../domain/templates/data/templateGoup';
 import { templatesService } from '../domain/templates/services';
 import { compact } from '../utils/array';
+
 import { getGlobalTemplateGroupsQuickPickItems, getTemplateGroupsOfWorkspaceFolderQuickPickItems, promptUserForTemplatesVariablesValues } from './utils/templateGroups';
 
 export const createFilesFromTemplateGroup = async (baseFolderUri: Uri): Promise<void> => {
@@ -58,22 +63,27 @@ export const createFilesFromTemplateGroup = async (baseFolderUri: Uri): Promise<
         ? templatesService.getGlobalTemplateById(templateId)
         : templatesService.getTemplateOfWorkspaceFolderById(workspaceFolder.uri, templateId)
     ))),
-  );
+  ).map((template) => new TemplateRenderer(template));
 
-  const templatesVariablesValues = await promptUserForTemplatesVariablesValues(
+  const variablesPerTemplates = await promptUserForTemplatesVariablesValues(
     templateGroup.metadata.templatesUseSameVariables,
     templatesOfGroup,
+    baseFolderUri,
   );
 
-  if (!templatesVariablesValues) { return; }
+  if (!variablesPerTemplates) { return; }
 
   const filesUris = await Promise.all(templatesOfGroup.map(
-    async (template): Promise<{ template: Template, fileUri: Uri, exists: boolean }> => {
-      const { fileTemplateName, id } = template.metadata;
+    async (templateRenderer): Promise<{
+      templateRenderer: TemplateRenderer;
+      fileUri: Uri;
+      exists: boolean;
+    }> => {
+      const { fileTemplateName, id } = templateRenderer.template.metadata;
 
       const fileUri = Uri.joinPath(
         baseFolderUri,
-        generateFileName(fileTemplateName, templatesVariablesValues[id]),
+        generateFileName(fileTemplateName, variablesPerTemplates[id]),
       );
 
       let exists = false;
@@ -82,14 +92,14 @@ export const createFilesFromTemplateGroup = async (baseFolderUri: Uri): Promise<
         await workspace.fs.stat(fileUri);
         exists = true;
       } catch (err) {
-        if (err.code === 'FileNotFound') {
+        if (err instanceof FileSystemError && err.code === 'FileNotFound') {
           exists = false;
         } else {
           throw err;
         }
       }
 
-      return { template, fileUri, exists };
+      return { templateRenderer, fileUri, exists };
     },
   ));
 
@@ -111,12 +121,11 @@ export const createFilesFromTemplateGroup = async (baseFolderUri: Uri): Promise<
   }
 
   // Create each file.
-  await Promise.all(filesUris.map(({ template, fileUri }) => (
-    renderFile(
+  await Promise.all(filesUris.map(({ templateRenderer, fileUri }) => (
+    templateRenderer.renderToFile(
       fileUri,
-      template,
-      templatesVariablesValues[template.metadata.id],
-      templatesOfGroup,
+      variablesPerTemplates[templateRenderer.template.metadata.id],
+      templatesOfGroup.map(({ template }) => template),
     )
   )));
 

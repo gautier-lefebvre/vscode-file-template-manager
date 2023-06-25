@@ -2,6 +2,7 @@ import { commands, window } from 'vscode';
 
 import { COMMANDS } from '../constants';
 import { Template } from '../domain/templates/data/template';
+
 import { getTemplateFoldersQuickPickItems } from './utils/folders';
 import { getTemplateQuickPickItemsOfSelectedFolder } from './utils/templates';
 

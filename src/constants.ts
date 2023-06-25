@@ -40,6 +40,8 @@ export const TEMPLATE_CONTENT_PLACEHOLDER = `/**
  * - relativeFilePath: path of the created file, relative to the workspace folder root.
  * - fileName: name of the file (with extension). e.g. "foo.module.scss".
  * - baseFileName: name of the file (without extension). e.g. "foo".
+ *
+ * You can also use any other variable, it will be prompted to you when creating a new file from this template if it was not resolved from the variables listed above.
  */
 `;
 
