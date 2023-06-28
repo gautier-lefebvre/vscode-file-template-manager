@@ -73,6 +73,18 @@ MyComponentBase.defaultProps = {
 export default memo(MyComponentBase);
 ```
 
+You can also use arbitrary ejs variable names in the template content. When a variable value is not known, then you will be prompted to enter it's value during the file creation, like so:
+
+```jsx
+import React, { memo } from 'react';
+
+export const <%= baseFileName %> = () => (
+  <div><%= variableInsideTemplate %></div>
+);
+```
+
+![image](https://github.com/maciej-adamus/vscode-file-template-manager/assets/101339738/faa4c60d-41e8-4d52-b43a-1992e98daff6)
+
 ### File template groups
 
 Additionally, you can define groups of templates, which allow you to generate multiple files from a single command.
