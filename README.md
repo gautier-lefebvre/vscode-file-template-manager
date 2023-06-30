@@ -73,7 +73,7 @@ MyComponentBase.defaultProps = {
 export default memo(MyComponentBase);
 ```
 
-You can also use arbitrary ejs variable names in the template content. When a variable value is not known, then you will be prompted to enter it's value during the file creation, like so:
+You can also use arbitrary ejs variable names in the template content. When a variable value is not known, then you will be prompted to enter its value during the file creation, like so:
 
 ```jsx
 import React, { memo } from 'react';
