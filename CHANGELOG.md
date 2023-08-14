@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.1]
+### Changed
+- Changed examples to use `<%-` tags instead of `<%=` because the latter escapes HTML entities, which is not useful outside of HTML templates.
+
 ## [1.1.0]
 ### Added
 - Prompt the user for any extra variable found inside a file template content that was not resolved from the template configuration, template file name, or global variables.
