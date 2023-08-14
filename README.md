@@ -28,24 +28,24 @@ For example, you may create a file template with the following manifest:
 And content:
 
 ```jsx
-// Created on <%= timestamp %>.
+// Created on <%- timestamp %>.
 import React, { memo } from 'react';
 
-export const <%= baseFileName %>Base = () => (
+export const <%- baseFileName %>Base = () => (
   <div />
 );
 
-<%= baseFileName %>Base.displayName = '<%= baseFileName %>';
+<%- baseFileName %>Base.displayName = '<%- baseFileName %>';
 
-<%= baseFileName %>Base.propTypes = {
-
-};
-
-<%= baseFileName %>Base.defaultProps = {
+<%- baseFileName %>Base.propTypes = {
 
 };
 
-export default memo(<%= baseFileName %>Base);
+<%- baseFileName %>Base.defaultProps = {
+
+};
+
+export default memo(<%- baseFileName %>Base);
 ```
 
 You can now create files from the template by right-clicking a folder in your open folder and selecting `New file from template`.
@@ -78,8 +78,8 @@ You can also use arbitrary ejs variable names in the template content. When a va
 ```jsx
 import React, { memo } from 'react';
 
-export const <%= baseFileName %> = () => (
-  <div><%= variableInsideTemplate %></div>
+export const <%- baseFileName %> = () => (
+  <div><%- variableInsideTemplate %></div>
 );
 ```
 
@@ -317,10 +317,10 @@ And file template content:
 ```jsx
 import { memo } from 'react';
 
-export const <%= baseFileName %> = memo(function <%= baseFileName %>() {
+export const <%- baseFileName %> = memo(function <%- baseFileName %>() {
   return (
     <div>
-      <%= someExtraVariable %>
+      <%- someExtraVariable %>
     </div>
   );
 });
